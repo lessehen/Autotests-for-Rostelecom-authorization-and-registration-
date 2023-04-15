@@ -17,7 +17,6 @@ from selenium.webdriver.support import expected_conditions as EC
 # 0.1. Для страницы авторизации по коду
 def test01_elements_code_auth(web_browser):
     page = StartCodeAuthPage(web_browser)
-
     assert page.h1.get_text() == 'Авторизация по коду'
     assert 'Укажите' in page.help_text.get_text()
     assert page.email_ad_form.is_visible()

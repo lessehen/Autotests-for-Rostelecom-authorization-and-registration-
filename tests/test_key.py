@@ -11,9 +11,8 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 # 0.1. Для страницы авторизации по коду
-def test01_elements_code_auth(web_browser):
+def test01_elements_code_auth(web_browser, pre_logout_key):
     page = KeyCodeAuthPage(web_browser)
-
     assert page.h1.get_text() == 'Авторизация по коду'
     assert 'Укажите' in page.help_text.get_text()
     assert page.email_ad_form.is_visible()
@@ -33,7 +32,7 @@ def test01_elements_code_auth(web_browser):
         assert page.code_forms.is_visible() and (page.resend_timeout.is_visible()
                                                  or page.too_many_codes_error.is_visible())
         if page.resend_timeout.is_visible():
-            time.sleep((int(page.resend_timeout.get_text().split()[5])))
+            time.sleep((int(page.resend_timeout.get_text().split()[5]))+3)
             assert page.btn_resend_code.is_clickable()
         # По требованиям должна быть надпись, на самом деле нет. На функционал не влияет, поэтому пока спрятала:
         # assert page.btn_resend_code.get_text() == 'Получить новый код'
@@ -60,7 +59,7 @@ def test01_elements_code_auth(web_browser):
 
 
 # 0.2. Для стандартной авторизации с паролем
-def test02_elements_standard_auth(web_browser):
+def test02_elements_standard_auth(web_browser, pre_logout_key):
     page = KeyPasswordAuthPage(web_browser)
     page.btn_standard_auth.click()
     assert page.h1.get_text() == 'Авторизация'
@@ -79,7 +78,7 @@ def test02_elements_standard_auth(web_browser):
 
 
 # 0.3. Для восстановления пароля
-def test03_elements_reset_password(web_browser):
+def test03_elements_reset_password(web_browser, pre_logout_key):
     page = KeyResetPasswordPage(web_browser)
     assert page.h1.get_text() == 'Восстановление пароля'
     assert page.tab_phone.is_clickable() and page.tab_phone.get_text() == 'Телефон'
@@ -92,7 +91,7 @@ def test03_elements_reset_password(web_browser):
 
 
 # 0.4. Для страницы регистрации
-def test04_elements_st_reg(web_browser):
+def test04_elements_st_reg(web_browser, pre_logout_key):
     page = KeyRegPage(web_browser)
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -113,13 +112,8 @@ def test04_elements_st_reg(web_browser):
     # Mail.ru в отдельном тесте с полным сценарием авторизации.
 @pytest.mark.parametrize("email", [google_email, yandex_email],
                          ids=["gmail", "yandex"])
-def test1_email_code_auth_is_available_pos(web_browser, email):
-
+def test1_email_code_auth_is_available_pos(web_browser, pre_logout_key, email):
     page = KeyCodeAuthPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyCodeAuthPage(web_browser)
 
     # Проверяем, нет ли на странице капчи, которую мы не сможем пройти (появляется после кучи прогонов)
     if page.captcha_form.is_presented():
@@ -143,14 +137,8 @@ def test1_email_code_auth_is_available_pos(web_browser, email):
 
 # 2. Авторизация по коду на email - полный сценарий через mail.ru
 @pytest.mark.xfail(reason='Не тот код / в кабинет не попасть')
-def test2_email_code_auth_pos(web_browser):
+def test2_email_code_auth_pos(web_browser, pre_logout_key):
     page = KeyCodeAuthPage(web_browser)
-    # Для Ключа проверяем в начале теста, что пользователь разлогинен. Логику с выходом из кабинета в конце реализовать
-    # не удалось из-за того, что я считаю отображаемую страницу багом, и ассерт прекращает работу теста до логаута
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyCodeAuthPage(web_browser)
 
     # Проверяем, нет ли на странице капчи, которую мы не сможем пройти (появляется после кучи прогонов)
     if page.captcha_form.is_presented():
@@ -175,13 +163,9 @@ def test2_email_code_auth_pos(web_browser):
 # 3. Доступность авторизации по коду на телефон
 @pytest.mark.parametrize("phone", [seven_phone, eight_phone],
                          ids=["+7x format", "8x format"])
-def test3_phone_code_auth_is_available_pos(web_browser, phone):
+def test3_phone_code_auth_is_available_pos(web_browser, pre_logout_key, phone):
 
     page = KeyCodeAuthPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyCodeAuthPage(web_browser)
 
     if page.captcha_form.is_presented():
         pytest.skip("There is CAPTCHA, but I'm a robot")
@@ -206,12 +190,8 @@ def test3_phone_code_auth_is_available_pos(web_browser, phone):
 @pytest.mark.parametrize("email", [gmail_random, yandex_random],
                          ids=["gmail", "yandex"])
 @pytest.mark.xfail(reason='Может сгенерироваться уже зарегистрированный email (маловероятно, но факт)')
-def test4_autoreg_email_code_is_available_pos(web_browser, email):
+def test4_autoreg_email_code_is_available_pos(web_browser, pre_logout_key, email):
     page = KeyCodeAuthPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyCodeAuthPage(web_browser)
 
     if page.captcha_form.is_presented():
         pytest.skip("There is CAPTCHA, but I'm a robot")
@@ -233,13 +213,9 @@ def test4_autoreg_email_code_is_available_pos(web_browser, email):
 
 # 5. Авторегистрация по коду на email - полный сценарий через mail.ru
 @pytest.mark.xfail(reason='Не тот код / в кабинет не попасть')
-def test5_email_code_autoreg_pos(web_browser):
+def test5_email_code_autoreg_pos(web_browser, pre_logout_key):
 
     page = KeyCodeAuthPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyCodeAuthPage(web_browser)
 
     # Проверяем, нет ли на странице капчи, которую мы не сможем пройти (появляется после кучи прогонов)
     if page.captcha_form.is_presented():
@@ -263,13 +239,9 @@ def test5_email_code_autoreg_pos(web_browser):
 # 6. Негативные проверки для авторегистрации по коду на email
 @pytest.mark.parametrize("email", [email_fake_domain, email_error_domain, email_50, email_255, email_256, email_1000])
 @pytest.mark.xfail(reason='В данный момент код отправляется на любой email')
-def test6_autoreg_email_code_is_available_neg(web_browser, email):
+def test6_autoreg_email_code_is_available_neg(web_browser, pre_logout_key, email):
 
     page = KeyCodeAuthPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyCodeAuthPage(web_browser)
 
     if page.captcha_form.is_presented():
         pytest.skip("There is CAPTCHA, but I'm a robot")
@@ -291,15 +263,9 @@ def test6_autoreg_email_code_is_available_neg(web_browser, email):
 @pytest.mark.parametrize("email", [google_email, mailru_email, yandex_email],
                          ids=["gmail", "mailru", "yandex"])
 @pytest.mark.xfail(reason='В кабинет не попасть')
-def test7_email_password_auth_pos(web_browser, email):
+def test7_email_password_auth_pos(web_browser, pre_logout_key, email):
 
     page = KeyPasswordAuthPage(web_browser)
-    # Для Ключа проверяем в начале теста, что пользователь разлогинен. Логику с выходом из кабинета в конце реализовать
-    # не удалось из-за того, что я считаю отображаемую страницу багом, и ассерт прекращает работу теста до логаута
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyPasswordAuthPage(web_browser)
 
     page.btn_standard_auth.click()
 
@@ -322,14 +288,10 @@ def test7_email_password_auth_pos(web_browser, email):
 
 
 # 8. Авторизация по связке email-пароль - негативный тест с некорректным email
-def test8_invalid_email_password_auth_neg(web_browser):
+def test8_invalid_email_password_auth_neg(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyPasswordAuthPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyPasswordAuthPage(web_browser)
 
     page.btn_standard_auth.click()
 
@@ -349,14 +311,10 @@ def test8_invalid_email_password_auth_neg(web_browser):
 
 
 # 9. Авторизация по связке email-пароль - негативный тест с некорректным паролем
-def test9_email_invalid_password_auth_neg(web_browser):
+def test9_email_invalid_password_auth_neg(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyPasswordAuthPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyPasswordAuthPage(web_browser)
 
     page.btn_standard_auth.click()
 
@@ -379,14 +337,10 @@ def test9_email_invalid_password_auth_neg(web_browser):
 @pytest.mark.parametrize("phone", [seven_phone, eight_phone],
                          ids=["+7x format", "8x format"])
 @pytest.mark.xfail(reason='В кабинет не попасть')
-def test10_phone_password_auth_pos(web_browser, phone):
+def test10_phone_password_auth_pos(web_browser, pre_logout_key, phone):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyPasswordAuthPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyPasswordAuthPage(web_browser)
 
     page.btn_standard_auth.click()
 
@@ -414,14 +368,10 @@ def test10_phone_password_auth_pos(web_browser, phone):
 # 11. Авторизация по связке номер-пароль - негативные тесты с некорректными номерами
 @pytest.mark.parametrize("phone", [invalid_phone_11, invalid_phone_10, invalid_phone_12],
                          ids=["invalid 11 numbers", "invalid 10 numbers", "invalid 12 numbers"])
-def test11_invalid_phone_password_auth_neg(web_browser, phone):
+def test11_invalid_phone_password_auth_neg(web_browser, pre_logout_key, phone):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyPasswordAuthPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyPasswordAuthPage(web_browser)
 
     page.btn_standard_auth.click()
 
@@ -440,14 +390,10 @@ def test11_invalid_phone_password_auth_neg(web_browser, phone):
 
 
 # 12. Авторизация по связке телефон-пароль - негативный тест с некорректным паролем
-def test12_phone_invalid_password_auth_neg(web_browser):
+def test12_phone_invalid_password_auth_neg(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyPasswordAuthPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyPasswordAuthPage(web_browser)
 
     page.btn_standard_auth.click()
 
@@ -468,14 +414,10 @@ def test12_phone_invalid_password_auth_neg(web_browser):
 
 # 13. Авторизация по связке логин-пароль - позитивный тест
 @pytest.mark.xfail(reason='В кабинет не попасть')
-def test13_login_password_auth_pos(web_browser):
+def test13_login_password_auth_pos(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyPasswordAuthPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyPasswordAuthPage(web_browser)
 
     page.btn_standard_auth.click()
 
@@ -503,14 +445,10 @@ def test13_login_password_auth_pos(web_browser):
 # 14. Авторизация по связке логин-пароль - негативные тесты с некорректными логинами
 @pytest.mark.parametrize("login", [login_only_numbers, login_as_email, login_longer],
                          ids=["only numbers", "as email", "long"])
-def test14_invalid_login_password_auth_neg(web_browser, login):
+def test14_invalid_login_password_auth_neg(web_browser, pre_logout_key, login):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyPasswordAuthPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyPasswordAuthPage(web_browser)
 
     page.btn_standard_auth.click()
 
@@ -529,14 +467,10 @@ def test14_invalid_login_password_auth_neg(web_browser, login):
 
 
 # 15. Авторизация по связке логин-пароль - негативный тест с некорректным паролем
-def test15_login_invalid_password_auth_neg(web_browser):
+def test15_login_invalid_password_auth_neg(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyPasswordAuthPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyPasswordAuthPage(web_browser)
 
     page.btn_standard_auth.click()
 
@@ -561,7 +495,7 @@ def test15_login_invalid_password_auth_neg(web_browser):
     # состояния
 @pytest.mark.parametrize("email", [google_email, mailru_email, yandex_email],
                          ids=["gmail", "mailru", "yandex"])
-def test16_email_reset_password_is_available(web_browser, email):
+def test16_email_reset_password_is_available(web_browser, pre_logout_key, email):
 
     page = KeyResetPasswordPage(web_browser)
 
@@ -581,7 +515,7 @@ def test16_email_reset_password_is_available(web_browser, email):
     # Т. к. капчу ввести не можем, проверяем просто, что телефон вводится и кнопка нажимается, без негативных проверок
 @pytest.mark.parametrize("phone", [seven_phone, eight_phone],
                          ids=["+7x format", "8x format"])
-def test17_phone_reset_password_is_available(web_browser, phone):
+def test17_phone_reset_password_is_available(web_browser, pre_logout_key, phone):
 
     page = KeyResetPasswordPage(web_browser)
 
@@ -600,14 +534,10 @@ def test17_phone_reset_password_is_available(web_browser, phone):
 @pytest.mark.parametrize("email", [gmail_random, yandex_random],
                          ids=["gmail", "yandex"])
 @pytest.mark.xfail(reason='Может сгенерироваться уже зарегистрированный email (маловероятно, но факт)')
-def test18_standard_reg_dif_emails_pos(web_browser, email):
+def test18_standard_reg_dif_emails_pos(web_browser, pre_logout_key, email):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -632,14 +562,10 @@ def test18_standard_reg_dif_emails_pos(web_browser, email):
 
 
 # 19. Регистрация - негативный тест с уже зарегистрированным email
-def test19_standard_reg_used_email_neg(web_browser):
+def test19_standard_reg_used_email_neg(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -665,14 +591,10 @@ def test19_standard_reg_used_email_neg(web_browser):
 
 # 20. Регистрация - полный сценарий через mail.ru
 @pytest.mark.xfail(reason='Не тот код / в кабинет не попасть')
-def test20_standard_reg_mailru_pos(web_browser):
+def test20_standard_reg_mailru_pos(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -703,14 +625,10 @@ def test20_standard_reg_mailru_pos(web_browser):
 # 21. Регистрация - негативные тесты для некорректных email
 @pytest.mark.parametrize("email", [email_fake_domain, email_error_domain, email_50, email_255, email_256, email_1000])
 @pytest.mark.xfail(reason='В данный момент код отправляется на любой email')
-def test21_standard_reg_dif_emails_neg(web_browser, email):
+def test21_standard_reg_dif_emails_neg(web_browser, pre_logout_key, email):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -739,14 +657,10 @@ def test21_standard_reg_dif_emails_neg(web_browser, email):
     # парсить страницу через api-запрос. Пусть будет просто проверка того, что система не выдаёт сообщение об ошибке =
     # принимает введённый текст (без проверки того, как этот текст отображается).
     # Все проверки внутри теста, а не через параметризацию, чтобы каждый раз заново не открывать страницу - это долго
-def test22_reg_name_validation_pos(web_browser):
+def test22_reg_name_validation_pos(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -794,14 +708,10 @@ def test22_reg_name_validation_pos(web_browser):
 
 
 # 23. Регистрация - негативные варианты заполнения поля "Имя", которые система не пропускает
-def test23_reg_name_validation_neg(web_browser):
+def test23_reg_name_validation_neg(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -894,14 +804,10 @@ def test23_reg_name_validation_neg(web_browser):
 
 # 24. Регистрация - xfail-негативные варианты заполнения поля "Имя"
 @pytest.mark.xfail(reason='Пропускает имя с последним символом дефисом')
-def test24_reg_name_validation_neg_xfail(web_browser):
+def test24_reg_name_validation_neg_xfail(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -918,14 +824,10 @@ def test24_reg_name_validation_neg_xfail(web_browser):
 
 # 25. Регистрация - передаём пустое поле "Имя"
 @pytest.mark.parametrize("name", [name_empty, name_spaces])
-def test25_standard_reg_empty_name_neg(web_browser, name):
+def test25_standard_reg_empty_name_neg(web_browser, pre_logout_key, name):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -949,14 +851,10 @@ def test25_standard_reg_empty_name_neg(web_browser, name):
 
 
 # 26. Регистрация - позитивные варианты заполнения поля "Фамилия"
-def test26_reg_lastname_validation_pos(web_browser):
+def test26_reg_lastname_validation_pos(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -1004,14 +902,10 @@ def test26_reg_lastname_validation_pos(web_browser):
 
 
 # 27. Регистрация - негативные варианты заполнения поля "Фамилия", которые система не пропускает
-def test27_reg_lastname_validation_neg(web_browser):
+def test27_reg_lastname_validation_neg(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -1104,14 +998,10 @@ def test27_reg_lastname_validation_neg(web_browser):
 
 # 28. Регистрация - xfail-негативные варианты заполнения поля "Фамилия"
 @pytest.mark.xfail(reason='Пропускает имя с последним символом дефисом')
-def test28_reg_lastname_validation_neg_xfail(web_browser):
+def test28_reg_lastname_validation_neg_xfail(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -1128,14 +1018,10 @@ def test28_reg_lastname_validation_neg_xfail(web_browser):
 
 # 29. Регистрация - передаём пустое поле "Фамилия"
 @pytest.mark.parametrize("lastname", [lastname_empty, lastname_spaces])
-def test29_standard_reg_empty_lastname_neg(web_browser, lastname):
+def test29_standard_reg_empty_lastname_neg(web_browser, pre_logout_key, lastname):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -1160,14 +1046,10 @@ def test29_standard_reg_empty_lastname_neg(web_browser, lastname):
 
 # 30. Регистрация - тесты для корректных вариантов пароля
 @pytest.mark.parametrize("password", [password_valid_8, password_valid_20])
-def test30_standard_reg_dif_passwords_pos(web_browser, password):
+def test30_standard_reg_dif_passwords_pos(web_browser, pre_logout_key, password):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -1192,14 +1074,10 @@ def test30_standard_reg_dif_passwords_pos(web_browser, password):
 
 
 # 31. Регистрация - валидация поля для некорректных паролей
-def test31_standard_reg_invalid_passwords_neg(web_browser):
+def test31_standard_reg_invalid_passwords_neg(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()
@@ -1226,14 +1104,10 @@ def test31_standard_reg_invalid_passwords_neg(web_browser):
 
 
 # 32. Регистрация - введённые пароли не совпадают
-def test32_standard_reg_invalid_password_confirm_neg(web_browser):
+def test32_standard_reg_invalid_password_confirm_neg(web_browser, pre_logout_key):
 
     # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
     page = KeyRegPage(web_browser)
-    if page.btn_logout.is_visible():
-        page.btn_logout.click()
-        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
-        page = KeyRegPage(web_browser)
 
     page.btn_standard_auth.click()
     page.btn_to_reg.click()

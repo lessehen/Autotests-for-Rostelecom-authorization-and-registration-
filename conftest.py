@@ -1,5 +1,9 @@
 import pytest
 from selenium import webdriver
+from pages.key_pages import *
+from pages.start_pages import *
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 @pytest.fixture
@@ -28,6 +32,14 @@ def web_browser():
     driver = webdriver.Chrome("chromedriver112.exe")
     yield driver
     driver.quit()
+
+
+@pytest.fixture(scope="function")
+def pre_logout_key(web_browser):
+    page = KeyCodeAuthPage(web_browser)
+    if page.btn_logout.is_visible():
+        page.btn_logout.click()
+        WebDriverWait(web_browser, 30).until(EC.title_is('Ростелеком ID'))
 
 
 def get_test_case_docstring(item):
