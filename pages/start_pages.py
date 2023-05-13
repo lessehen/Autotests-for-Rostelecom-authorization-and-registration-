@@ -24,9 +24,11 @@ class StartCodeAuthPage(WebPage):
     captcha_form = captcha_form
     user_name = user_name
     cabinet = cabinet
-    btn_logout = btn_logout
+    btn_logout = btn_logout_start
     help_text = help_text
     userpic = userpic
+    btn_edit = btn_edit
+    user_data = user_data
     too_many_codes_error = too_many_codes_error
 
 
@@ -60,10 +62,12 @@ class StartPasswordAuthPage(WebPage):
     tab_ls = tab_ls
     captcha_form = captcha_form
     user_name = user_name
-    btn_logout = btn_logout
+    btn_logout = btn_logout_start
     error_message = error_message
     cabinet = cabinet
     userpic = userpic
+    btn_edit = btn_edit
+    user_data = user_data
     too_many_codes_error = too_many_codes_error
 
 
@@ -122,6 +126,6 @@ class StartRegPage(WebPage):
     user_name = user_name
     userpic = userpic
     code_forms = code_forms
-    btn_logout = btn_logout
+    btn_logout = btn_logout_start
     cabinet = cabinet
     error_popup = error_popup

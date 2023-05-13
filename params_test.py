@@ -1,5 +1,7 @@
 from help_functions import generate_alphanum_random_string
 
+valid_password = '&IsguorIR2T4J'
+
 google_email = 'testov.testov.test.test@gmail.com'
 gmail_random = f'testov.testov.test.test+{generate_alphanum_random_string(16)}@gmail.com'
 
@@ -9,7 +11,8 @@ mailru_random = f'test_test_testov_testov+{generate_alphanum_random_string(16)}@
 yandex_email = 'test.test.testov.testov@yandex.ru'
 yandex_random = f'test.test.testov.testov+{generate_alphanum_random_string(16)}@yandex.ru'
 
-seven_phone = '+7 913 982-32-85'
+seven_phone_plus = '+7 913 982-32-85'
+seven_phone_without_plus = '7 913 982-32-85'
 eight_phone = '8 913 982-32-85'
 invalid_phone_11 = '12345678910'
 invalid_phone_10 = '7345678910'
@@ -22,7 +25,6 @@ login_only_numbers = '1681039760749'
 login_as_email = 'test.test.testov.testov'
 login_longer = 'rtkid_16810397607499'
 
-valid_password = '&IsguorIR2T4J'
 password_valid_8 = '&Isguor8'
 password_valid_20 = '&IsguorIR2T4J&Isguor'
 invalid_password = 'qwert12345'

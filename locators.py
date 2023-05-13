@@ -28,12 +28,13 @@ btn_to_reg = WebElement(id='kc-register')  # кнопка перехода к р
 btn_reset = WebElement(id='reset')  # кнопка сброса пароля
 btn_reset_back = WebElement(id='reset-back')  # кнопка "вернуться назад" со страницы сброса пароля
 btn_reg = WebElement(name='register')  # кнопка "зарегистрироваться" после заполнения формы
-btn_logout = WebElement(class_name='sc-bnOPBZ.dvyUXv')
+btn_logout_start = WebElement(class_name='sc-bnOPBZ.dvyUXv')
 btn_logout_onlime = WebElement(id='logout-btn')
 btn_logout_key = WebElement(class_name='changeUserLink--ecCgz')
 btn_logout_shome = WebElement(class_name='sc-ipEyDJ.jXHLMj.button___3jo3H.button___2W6wR')
 btn_onlime_go = WebElement(xpath='/html/body/div/main/section[2]/div/div')
 btn_key_go = WebElement(class_name='redirect--kJuuA')
+btn_edit = WebElement(class_name='sc-cxVPaa.fiyVJD')
 
 # Прочие локаторы
 h1 = WebElement(tag_name='h1')
@@ -62,3 +63,4 @@ captcha_image = WebElement(class_name='rt-captcha__image')
 userpic = WebElement(xpath='/html/body/div[1]/div/div/div[1]/div/div[1]/div[3]/div[2]')
 userpic_shome = WebElement(class_name='profileLink___pMvUU')
 my_home = WebElement(id='go_to_home_1088532')
+user_data = WebElement(xpath='/html/body/div[5]/div[1]/div[2]/div/div/div[2]/div/p[1]')

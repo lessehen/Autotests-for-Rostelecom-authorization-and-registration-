@@ -2,13 +2,12 @@ from pages.start_pages import *
 from params_test import *
 from help_functions import *
 
-
-# Это своего рода базовые тесты - с них начинала, т. к. Старт Web предусматривает все доступные сценарии.
-# Тесты для других продуктов брала отсюда и немного подстраивала под требования / условия.
+# Тесты для "Старт Web" - базовые для этого проекта и лежат в основе всех остальных тестов.
 
 # 0. Проверка наличия элементов на страницах и их локаторов.
-# Делаю такой мега-тест с кучей ассертов, хотя можно разбить на отдельные - но мы тут заполняем формы и
-# тыкаем на кнопки. Если один ассерт не пройдёт, тест сразу упадёт, но можно по цепочке разбирать постепенно))0)
+# Внутри одного теста проверяется наличие / кликабельность всех необходимых элементов. Идея была в том, что перед
+# запуском самих тестовых сценариев можно быстро проверить элементы, чтобы пофиксить локаторы, если они изменились.
+# Раскладывать на отдельные тесты смысла особого не увидела, потому что сомневаюсь, что могут сломать всё и сразу :)
 
 
 class TestElementsPresence:
@@ -21,17 +20,17 @@ class TestElementsPresence:
         assert page.btn_get_code.is_clickable() and page.btn_get_code.get_text() == 'Получить код'
         assert page.btn_standard_auth.is_clickable() and page.btn_standard_auth.get_text() == 'Войти с паролем'
         captcha_search(page)  # Проверяем, нет ли капчи. Если есть - тест пропускается
-        page.email_ad_form.send_keys(seven_phone)
+        page.email_ad_form.send_keys(seven_phone_plus)
         code_timer_wait(page)  # Если на странице отображается таймер - ждём
         page.btn_get_code.click()
         assert page.h1.get_text() == 'Код подтверждения отправлен' and page.code_send.get_text() == f'По SMS на номер '\
-                                                                                                    f'{seven_phone}'
+                                                                                                    f'{seven_phone_plus}'
         assert page.btn_change_data.is_clickable() and page.btn_change_data.get_text() == 'Изменить номер'
         assert page.code_forms.is_visible() and (page.resend_timeout.is_visible()
                                                  or page.too_many_codes_error.is_visible())
         resend_timer_wait(page)
         assert page.btn_resend_code.is_clickable()
-        # По требованиям должна быть надпись, на самом деле нет. На функционал не влияет, поэтому пока спрятала:
+        # По требованиям должна быть надпись, на самом деле нет. На функционал не влияет, поэтому проверку спрятала:
         # assert page.btn_resend_code.get_text() == 'Получить новый код'
 
         page.btn_change_data.click()
@@ -47,11 +46,11 @@ class TestElementsPresence:
                                                  or page.too_many_codes_error.is_visible())
         resend_timer_wait(page)
         assert page.btn_resend_code.is_clickable()
-        # По требованиям должна быть надпись, на самом деле нет. На функционал не влияет, поэтому пока спрятала:
+        # По требованиям должна быть надпись, на самом деле нет. На функционал не влияет, поэтому проверку спрятала:
         # assert page.btn_resend_code.get_text() == 'Получить новый код'
 
-    # 0.2. Для стандартной авторизации с паролем
-    def test02_elements_standard_auth(self, web_browser):
+    # 0.2. Для авторизации с паролем
+    def test02_elements_password_auth(self, web_browser):
         page = StartPasswordAuthPage(web_browser)
         page.btn_standard_auth.click()
         assert page.h1.get_text() == 'Авторизация'
@@ -118,7 +117,7 @@ class TestCodeAuthReg:
 
     # 2. Авторизация по коду на email - полный сценарий через mail.ru
     @pytest.mark.xfail(reason='Код может не прийти или прийти с большой задержкой, если было много прогонов')
-    def test2_email_code_auth_pos(self, web_browser):
+    def test2_email_code_auth_pos(self, web_browser, logout_start):
         page = StartCodeAuthPage(web_browser)
         captcha_search(page)
         page.email_ad_form.send_keys(mailru_email)
@@ -127,16 +126,15 @@ class TestCodeAuthReg:
         time.sleep(15)  # очень долгое ожидание, чтобы письмо точно успело прийти (подбирала эмпирически)
         page.code_forms.send_keys(code_from_email())
 
-        assert page.cabinet.get_text() == 'Личный кабинет'
-
-        # Выходим из личного кабинета
-        page.userpic.click()
-        page.btn_logout.click()
-        page.wait_page_loaded()  # добавляем это ожидание, потому что без него логаут не всегда успевает сработать
+        assert page.cabinet.get_text() == 'Личный кабинет'  # проверяем, что мы в личном кабинете
+        assert page.user_name.get_text() == 'Иван'  # Проверяем, что h2 соответствует имени пользователя
+        # Правильнее было бы проверить email пользователя, но это добавляло неоправданно большое количество действий
+        # (не только посмотреть ящик - лишние клики появлялись и для выхода из кабинета). Поэтому решила, что
+        # для учебного проекта можно не затягивать тест и оставить только проверку имени.
 
     # 3. Доступность авторизации по коду на телефон
-    @pytest.mark.parametrize("phone", [seven_phone, eight_phone],
-                             ids=["+7x format", "8x format"])
+    @pytest.mark.parametrize("phone", [seven_phone_plus, eight_phone, seven_phone_without_plus],
+                             ids=["+7x format", "8x format", "7x format"])
     def test3_phone_code_auth_is_available_pos(self, web_browser, phone):
         page = StartCodeAuthPage(web_browser)
         captcha_search(page)
@@ -146,7 +144,7 @@ class TestCodeAuthReg:
         page.wait_page_loaded()
 
         assert page.h1.get_text() == 'Код подтверждения отправлен'
-        assert page.code_send.get_text() == f'По SMS на номер {seven_phone}'
+        assert page.code_send.get_text() == f'По SMS на номер {seven_phone_plus}'
 
     # 4. Доступность авторегистрации по коду на email - позитивные тесты для популярных почтовых сервисов.
         # Mail.ru - отдельным тестом с полным сценарием
@@ -166,7 +164,7 @@ class TestCodeAuthReg:
 
     # 5. Авторегистрация по коду на email - полный сценарий через mail.ru
     @pytest.mark.xfail(reason='Код может не прийти или прийти с большой задержкой, если было много прогонов')
-    def test5_email_code_autoreg_pos(self, web_browser):
+    def test5_email_code_autoreg_pos(self, web_browser, logout_start):
 
         page = StartCodeAuthPage(web_browser)
         captcha_search(page)
@@ -177,11 +175,6 @@ class TestCodeAuthReg:
         page.code_forms.send_keys(code_from_email())
 
         assert page.cabinet.get_text() == 'Личный кабинет'
-
-        # Выходим из личного кабинета
-        page.userpic.click()
-        page.btn_logout.click()
-        page.wait_page_loaded()
 
     # 6. Негативные проверки для авторегистрации по коду на email
     @pytest.mark.parametrize("email", [email_fake_domain, email_error_domain, email_50, email_255, email_256, email_1000])
@@ -202,7 +195,7 @@ class TestPassAuth:
     # 7. Авторизация по связке email-пароль - позитивные тесты для популярных почтовых сервисов
     @pytest.mark.parametrize("email", [google_email, mailru_email, yandex_email],
                              ids=["gmail", "mailru", "yandex"])
-    def test7_email_password_auth_pos(self, web_browser, email):
+    def test7_email_password_auth_pos(self, web_browser, logout_start, email):
 
         # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
         page = StartPasswordAuthPage(web_browser)
@@ -215,12 +208,7 @@ class TestPassAuth:
         page.btn_login.click()
 
         assert page.cabinet.get_text() == 'Личный кабинет'
-        assert page.user_name.get_text() == 'Иван'  # Проверяем, что h2 соответствует имени пользователя в личном кабинете
-
-        # Выходим из личного кабинета
-        page.userpic.click()
-        page.btn_logout.click()
-        page.wait_page_loaded()
+        assert page.user_name.get_text() == 'Иван'  # Проверяем, что h2 соответствует имени пользователя
 
     # 8. Авторизация по связке email-пароль - негативный тест с некорректным email
     def test8_invalid_email_password_auth_neg(self, web_browser):
@@ -255,9 +243,9 @@ class TestPassAuth:
         assert page.error_message.get_text() == 'Неверный логин или пароль'
 
     # 10. Авторизация по связке телефон-пароль - позитивные тесты
-    @pytest.mark.parametrize("phone", [seven_phone, eight_phone],
-                             ids=["+7x format", "8x format"])
-    def test10_phone_password_auth_pos(self, web_browser, phone):
+    @pytest.mark.parametrize("phone", [seven_phone_plus, eight_phone, seven_phone_without_plus],
+                             ids=["+7x format", "8x format", "7x format"])
+    def test10_phone_password_auth_pos(self, web_browser, phone, logout_start):
 
         # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
         page = StartPasswordAuthPage(web_browser)
@@ -271,11 +259,6 @@ class TestPassAuth:
 
         assert page.cabinet.get_text() == 'Личный кабинет'
         assert page.user_name.get_text() == 'Анастасия'  # Проверяем, что h2 соответствует имени пользователя в ЛК
-
-        # Выходим из личного кабинета
-        page.userpic.click()
-        page.btn_logout.click()
-        page.wait_page_loaded()
 
     # 11. Авторизация по связке номер-пароль - негативные тесты с некорректными номерами
     @pytest.mark.parametrize("phone", [invalid_phone_11, invalid_phone_10, invalid_phone_12],
@@ -301,7 +284,7 @@ class TestPassAuth:
         page = StartPasswordAuthPage(web_browser)
         page.btn_standard_auth.click()
 
-        page.phone_us_form.send_keys(seven_phone)
+        page.phone_us_form.send_keys(seven_phone_plus)
         page.password_form.send_keys(invalid_password)
         captcha_search(page)
         code_timer_wait(page)
@@ -311,7 +294,7 @@ class TestPassAuth:
         assert page.error_message.get_text() == 'Неверный логин или пароль'
 
     # 13. Авторизация по связке логин-пароль - позитивный тест
-    def test13_login_password_auth_pos(self, web_browser):
+    def test13_login_password_auth_pos(self, web_browser, logout_start):
 
         # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
         page = StartPasswordAuthPage(web_browser)
@@ -325,11 +308,6 @@ class TestPassAuth:
 
         assert page.cabinet.get_text() == 'Личный кабинет'
         assert page.user_name.get_text() == 'Иван'  # Проверяем, что h2 соответствует имени пользователя в ЛК
-
-        # Выходим из личного кабинета
-        page.userpic.click()
-        page.btn_logout.click()
-        page.wait_page_loaded()
 
     # 14. Авторизация по связке логин-пароль - негативные тесты с некорректными логинами
     @pytest.mark.parametrize("login", [login_only_numbers, login_as_email, login_longer],
@@ -367,9 +345,9 @@ class TestPassAuth:
 
 class TestResetPass:
     # 16. Доступность восстановления пароля по коду на email
-        # Т. к. капчу ввести не можем, проверяем просто, что почта вводится и кнопка нажимается
-        # Тест по большому счёту бессмысленный, то если вдруг отключат капчу, его можно было бы быстро допилить до рабочего
-        # состояния
+    # Т. к. капчу ввести не можем, проверяем просто, что почта вводится и кнопка нажимается
+    # Тест по большому счёту бессмысленный, но если вдруг отключат капчу, его можно было бы быстро допилить до рабочего
+    # состояния
     @pytest.mark.parametrize("email", [google_email, mailru_email, yandex_email],
                              ids=["gmail", "mailru", "yandex"])
     def test16_email_reset_password_is_available(self, web_browser, email):
@@ -384,9 +362,9 @@ class TestResetPass:
         assert page.error_message.get_text() == 'Неверный логин или текст с картинки'
 
     # 17. Доступность восстановления пароля по коду на телефон
-        # Т. к. капчу ввести не можем, проверяем просто, что телефон вводится и кнопка нажимается, без негативных проверок
-    @pytest.mark.parametrize("phone", [seven_phone, eight_phone],
-                             ids=["+7x format", "8x format"])
+    # Т. к. капчу ввести не можем, проверяем просто, что телефон вводится и кнопка нажимается, без негативных проверок
+    @pytest.mark.parametrize("phone", [seven_phone_plus, eight_phone, seven_phone_without_plus],
+                             ids=["+7x format", "8x format", "7x format"])
     def test17_phone_reset_password_is_available(self, web_browser, phone):
 
         page = StartResetPasswordPage(web_browser)
@@ -404,7 +382,6 @@ class TestRegistration:
                              ids=["gmail", "yandex"])
     @pytest.mark.xfail(reason='Может сгенерироваться уже зарегистрированный email (маловероятно, но факт)')
     def test18_standard_reg_dif_emails_pos(self, web_browser, email):
-
         # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
         page = StartRegPage(web_browser)
         page.btn_standard_auth.click()
@@ -422,31 +399,9 @@ class TestRegistration:
         assert page.h1.get_text() == 'Подтверждение email'
         assert page.reg_code_send.get_text() == f'Kод подтверждения отправлен на адрес {email}'
 
-    # 19. Регистрация - негативный тест с уже зарегистрированным email
-    def test19_standard_reg_used_email_neg(self, web_browser):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
-        page = StartRegPage(web_browser)
-        page.btn_standard_auth.click()
-        page.btn_to_reg.click()
-
-        page.name_form.send_keys(name)
-        page.lastname_form.send_keys(lastname)
-        captcha_search(page)
-        page.email_ad_form.send_keys(google_email)
-        page.password_form.send_keys(valid_password)
-        page.password_confirm_form.send_keys(valid_password)
-        code_timer_wait(page)
-        page.btn_reg.click()
-
-        # Вообще ожидаем некоторое сообщение об ошибке, но т. к. его нет, проверяем, что нам на почту не отправили код
-        assert page.error_popup.get_text() == 'Учётная запись уже существует'
-
-    # 20. Регистрация - полный сценарий через mail.ru
+    # 19. Регистрация - полный сценарий через mail.ru
     @pytest.mark.xfail(reason='Код может не прийти или прийти с большой задержкой, если было много прогонов')
-    def test20_standard_reg_mailru_pos(self, web_browser):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+    def test19_standard_reg_mailru_pos(self, web_browser, logout_start):
         page = StartRegPage(web_browser)
         page.btn_standard_auth.click()
         page.btn_to_reg.click()
@@ -465,17 +420,28 @@ class TestRegistration:
 
         assert page.cabinet.get_text() == 'Личный кабинет'
 
-        # Выходим из личного кабинета
-        page.userpic.click()
-        page.btn_logout.click()
-        page.wait_page_loaded()
+    # 20. Регистрация - негативный тест с уже зарегистрированным email
+    def test20_standard_reg_used_email_neg(self, web_browser):
+        page = StartRegPage(web_browser)
+        page.btn_standard_auth.click()
+        page.btn_to_reg.click()
+
+        page.name_form.send_keys(name)
+        page.lastname_form.send_keys(lastname)
+        captcha_search(page)
+        page.email_ad_form.send_keys(google_email)
+        page.password_form.send_keys(valid_password)
+        page.password_confirm_form.send_keys(valid_password)
+        code_timer_wait(page)
+        page.btn_reg.click()
+
+        # Вообще ожидаем некоторое сообщение об ошибке, но т. к. его нет, проверяем, что нам на почту не отправили код
+        assert page.error_popup.get_text() == 'Учётная запись уже существует'
 
     # 21. Регистрация - негативные тесты для некорректных email
     @pytest.mark.parametrize("email", [email_fake_domain, email_error_domain, email_50, email_255, email_256, email_1000])
     @pytest.mark.xfail(reason='В данный момент код отправляется на любой email')
     def test21_standard_reg_dif_emails_neg(self, web_browser, email):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
         page = StartRegPage(web_browser)
         page.btn_standard_auth.click()
         page.btn_to_reg.click()
@@ -492,175 +458,58 @@ class TestRegistration:
         assert page.h1.get_text() != 'Подтверждение email'
 
     # 22. Регистрация - позитивные варианты заполнения поля "Имя"
-        # Здесь хотела проверить ещё и то, что при неправильном вводе имена адаптируются под маску. Но введённый текст лежит
-        # в двух span'ах, и мне удалось нагуглить только, как достать его через BeautifulSoup, но тогда вроде как нужно
-        # парсить страницу через api-запрос. Пусть будет просто проверка того, что система не выдаёт сообщение об ошибке =
-        # принимает введённый текст (без проверки того, как этот текст отображается).
-        # Все проверки внутри теста, а не через параметризацию, чтобы каждый раз заново не открывать страницу - это долго
-    def test22_reg_name_validation_pos(self, web_browser):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+    # В первой версии проекта все варианты подставлялись в рамках одного теста: вставили имя, проверили, что нет
+    # сообщения об ошибке, очистили поле, поставили новое имя... Это сокращает время выполнения теста, т. к. страница
+    # не грузится заново, но очень неудобно из-за большого количества лишнего кода. Да и проверять надо всё-таки
+    # весь сценарий, а не только отсутствие сообщения об ошибке :)
+    @pytest.mark.parametrize("name", [name_small, name_caps, name_yo, name_rare, name_2, name_hyphen,
+                                      name_hyphen_spaces, name_30])
+    def test22_reg_dif_names_pos(self, web_browser, name):
         page = StartRegPage(web_browser)
         page.btn_standard_auth.click()
         page.btn_to_reg.click()
 
-        page.name_form.send_keys(name_small)
-        page.lastname_form.click()
-        assert page.error_reg_forms.is_presented() is False
-        # assert page.name_input.get_text() == name  # не достаёт текст из поля
+        page.name_form.send_keys(name)
+        page.lastname_form.send_keys(lastname)
+        captcha_search(page)
+        page.email_ad_form.send_keys(gmail_random)
+        page.password_form.send_keys(valid_password)
+        page.password_confirm_form.send_keys(valid_password)
+        assert page.error_reg_forms.is_presented() is False  # не отображается сообщение об ошибке
+        # Дальше код закрыт, потому что мне не нравится мысль инициировать создание кучи учёток,
+        # которые я не смогу удалить
+        # code_timer_wait(page)
+        # page.btn_reg.click()
+        # assert page.h1.get_text() == 'Подтверждение email'
+        # assert page.reg_code_send.get_text() == f'Kод подтверждения отправлен на адрес {gmail_random}'
 
-        # очищаем поле
-        page.name_form.clear()
-        page.name_form.send_keys(name_caps)
-        page.lastname_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_yo)
-        page.lastname_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_rare)
-        page.lastname_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_2)
-        page.lastname_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_hyphen)
-        page.lastname_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_hyphen_spaces)
-        page.lastname_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_30)
-        page.lastname_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-    # 23. Регистрация - негативные варианты заполнения поля "Имя", которые система не пропускает
-    def test23_reg_name_validation_neg(self, web_browser):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
-        page = StartRegPage(web_browser)
-        page.btn_standard_auth.click()
-        page.btn_to_reg.click()
-
-        page.name_form.send_keys(name_medium_dash)
-        page.lastname_form.double_click()  # даблклик, потому что он с ожиданием - чтобы убедиться, что ошибка не исчезает
-        assert page.error_reg_forms.is_presented() is True
-
-        # очищаем поле
-        page.name_form.clear()
-        page.name_form.send_keys(name_long_dash)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_number_dash)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_with_space)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_lat)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_cyr_lat)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_cyr_num)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_cyr_spec)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_nums)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_specs)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_cyr_chin)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_chin)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_first_hyph)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_2_first_hyph)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_2_hyph)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_3_words_hyph)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.name_form.clear()
-        page.name_form.send_keys(name_31)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-    # 24. Регистрация - xfail-негативные варианты заполнения поля "Имя"
+    # 23. Регистрация - негативные варианты заполнения поля "Имя"
+    # Здесь было аналогично 22 тесту, но тоже нельзя ограничиться чисто проверкой валидации - нельзя быть уверенным,
+    # что даже при наличии ошибки форма не отправится :)
+    @pytest.mark.parametrize("name", [name_medium_dash, name_long_dash, name_number_dash, name_with_space, name_lat,
+                                      name_cyr_lat, name_cyr_num, name_cyr_spec, name_nums, name_specs, name_cyr_chin,
+                                      name_chin, name_first_hyph, name_2_first_hyph, name_2_hyph, name_3_words_hyph,
+                                      name_31, name_empty, name_spaces, name_last_hyph, name_2_last_hyph])
     @pytest.mark.xfail(reason='Пропускает имя с последним символом дефисом')
-    def test24_reg_name_validation_neg_xfail(self, web_browser):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+    def test23_reg_dif_names_neg(self, web_browser, name):
         page = StartRegPage(web_browser)
         page.btn_standard_auth.click()
         page.btn_to_reg.click()
 
-        page.name_form.send_keys(name_last_hyph)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
+        page.name_form.send_keys(name)
+        page.lastname_form.send_keys(lastname)
+        captcha_search(page)
+        page.email_ad_form.send_keys(gmail_random)
+        page.password_form.send_keys(valid_password)
+        page.password_confirm_form.send_keys(valid_password)
+        assert page.error_reg_forms.is_presented() is True  # отображается сообщение об ошибке
+        code_timer_wait(page)
+        page.btn_reg.click()
+        assert page.h1.get_text() != 'Подтверждение email'
 
-        page.name_form.clear()
-        page.name_form.send_keys(name_2_last_hyph)
-        page.lastname_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-    # 25. Регистрация - передаём пустое поле "Имя"
+    # 24. Регистрация - пустое поле "Имя"
     @pytest.mark.parametrize("name", [name_empty, name_spaces])
-    def test25_standard_reg_empty_name_neg(self, web_browser, name):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+    def test24_reg_dif_names_neg(self, web_browser, name):
         page = StartRegPage(web_browser)
         page.btn_standard_auth.click()
         page.btn_to_reg.click()
@@ -673,174 +522,57 @@ class TestRegistration:
         page.password_confirm_form.send_keys(valid_password)
         code_timer_wait(page)
         page.btn_reg.click()
+        assert page.h1.get_text() != 'Подтверждение email'
 
-        assert page.error_reg_forms.is_presented() is True
-
-    # 26. Регистрация - позитивные варианты заполнения поля "Фамилия"
-    def test26_reg_lastname_validation_pos(self, web_browser):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+    # 25. Регистрация - позитивные варианты заполнения поля "Фамилия"
+    @pytest.mark.parametrize("lastname", [lastname_small, lastname_caps, lastname_yo, lastname_rare, lastname_2,
+                                          lastname_hyphen, lastname_hyphen_spaces, lastname_30])
+    def test25_reg_dif_lastnames_pos(self, web_browser, lastname):
         page = StartRegPage(web_browser)
         page.btn_standard_auth.click()
         page.btn_to_reg.click()
 
-        page.lastname_form.send_keys(lastname_small)
-        page.name_form.click()
-        assert page.error_reg_forms.is_presented() is False
-        # assert page.name_input.get_text() == name  # не достаёт текст из поля
+        page.name_form.send_keys(name)
+        page.lastname_form.send_keys(lastname)
+        captcha_search(page)
+        page.email_ad_form.send_keys(gmail_random)
+        page.password_form.send_keys(valid_password)
+        page.password_confirm_form.send_keys(valid_password)
+        assert page.error_reg_forms.is_presented() is False  # не отображается сообщение об ошибке
+        # Дальше код закрыт, потому что мне не нравится мысль инициировать создание кучи учёток,
+        # которые я не смогу удалить
+        # code_timer_wait(page)
+        # page.btn_reg.click()
+        # assert page.h1.get_text() == 'Подтверждение email'
+        # assert page.reg_code_send.get_text() == f'Kод подтверждения отправлен на адрес {gmail_random}'
 
-        # очищаем поле
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_caps)
-        page.name_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_yo)
-        page.name_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_rare)
-        page.name_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_2)
-        page.name_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_hyphen)
-        page.name_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_hyphen_spaces)
-        page.name_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_30)
-        page.name_form.click()
-        assert page.error_reg_forms.is_presented() is False
-
-    # 27. Регистрация - негативные варианты заполнения поля "Фамилия", которые система не пропускает
-    def test27_reg_lastname_validation_neg(self, web_browser):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+    # 26. Регистрация - негативные варианты заполнения поля "Фамилия"
+    @pytest.mark.parametrize("lastname", [lastname_medium_dash, lastname_long_dash, lastname_number_dash,
+                                          lastname_with_space, lastname_lat, lastname_cyr_lat, lastname_cyr_num,
+                                          lastname_cyr_spec, lastname_nums, lastname_specs, lastname_cyr_chin,
+                                          lastname_chin, lastname_first_hyph, lastname_2_first_hyph, lastname_2_hyph,
+                                          lastname_3_words_hyph, lastname_31,lastname_empty, lastname_spaces,
+                                          lastname_last_hyph, lastname_2_last_hyph])
+    @pytest.mark.xfail(reason='Пропускает фамилию с последним символом дефисом')
+    def test26_reg_dif_lastnames_neg(self, web_browser, lastname):
         page = StartRegPage(web_browser)
         page.btn_standard_auth.click()
         page.btn_to_reg.click()
 
-        page.lastname_form.send_keys(lastname_medium_dash)
-        page.name_form.double_click()  # даблклик, потому что он с ожиданием - чтобы убедиться, что ошибка не исчезает
-        assert page.error_reg_forms.is_presented() is True
+        page.name_form.send_keys(name)
+        page.lastname_form.send_keys(lastname)
+        captcha_search(page)
+        page.email_ad_form.send_keys(gmail_random)
+        page.password_form.send_keys(valid_password)
+        page.password_confirm_form.send_keys(valid_password)
+        assert page.error_reg_forms.is_presented() is True  # отображается сообщение об ошибке
+        code_timer_wait(page)
+        page.btn_reg.click()
+        assert page.h1.get_text() != 'Подтверждение email'
 
-        # очищаем поле
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_long_dash)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_number_dash)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_with_space)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_lat)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_cyr_lat)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_cyr_num)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_cyr_spec)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_nums)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_specs)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_cyr_chin)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_chin)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_first_hyph)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_2_first_hyph)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_2_hyph)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_3_words_hyph)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_31)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-    # 28. Регистрация - xfail-негативные варианты заполнения поля "Фамилия"
-    @pytest.mark.xfail(reason='Пропускает имя с последним символом дефисом')
-    def test28_reg_lastname_validation_neg_xfail(self, web_browser):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
-        page = StartRegPage(web_browser)
-        page.btn_standard_auth.click()
-        page.btn_to_reg.click()
-
-        page.lastname_form.send_keys(lastname_last_hyph)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.lastname_form.clear()
-        page.lastname_form.send_keys(lastname_2_last_hyph)
-        page.name_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-    # 29. Регистрация - передаём пустое поле "Фамилия"
+    # 27. Регистрация - пустое поле "Фамилия"
     @pytest.mark.parametrize("lastname", [lastname_empty, lastname_spaces])
-    def test29_standard_reg_empty_lastname_neg(self, web_browser, lastname):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+    def test26_reg_dif_lastnames_neg(self, web_browser, lastname):
         page = StartRegPage(web_browser)
         page.btn_standard_auth.click()
         page.btn_to_reg.click()
@@ -853,14 +585,11 @@ class TestRegistration:
         page.password_confirm_form.send_keys(valid_password)
         code_timer_wait(page)
         page.btn_reg.click()
+        assert page.h1.get_text() != 'Подтверждение email'
 
-        assert page.error_reg_forms.is_presented() is True
-
-    # 30. Регистрация - тесты для корректных вариантов пароля
+    # 26. Регистрация - тесты для корректных вариантов пароля
     @pytest.mark.parametrize("password", [password_valid_8, password_valid_20])
-    def test30_standard_reg_dif_passwords_pos(self, web_browser, password):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+    def test26_standard_reg_dif_passwords_pos(self, web_browser, password):
         page = StartRegPage(web_browser)
         page.btn_standard_auth.click()
         page.btn_to_reg.click()
@@ -878,38 +607,10 @@ class TestRegistration:
         assert page.h1.get_text() == 'Подтверждение email'
         assert page.reg_code_send.get_text() == f'Kод подтверждения отправлен на адрес {gmail_random}'
 
-    # 31. Регистрация - валидация поля для некорректных паролей
-    def test31_standard_reg_invalid_passwords_neg(self, web_browser):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
-        page = StartRegPage(web_browser)
-        page.btn_standard_auth.click()
-        page.btn_to_reg.click()
-
-        page.password_form.send_keys(password_invalid_7)
-        page.password_confirm_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        # очищаем поле
-        page.password_form.clear()
-        page.password_form.send_keys(password_invalid_small)
-        page.password_confirm_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.password_form.clear()
-        page.password_form.send_keys(password_invalid_caps)
-        page.password_confirm_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-        page.password_form.clear()
-        page.password_form.send_keys(password_invalid_21)
-        page.password_confirm_form.double_click()
-        assert page.error_reg_forms.is_presented() is True
-
-    # 32. Регистрация - введённые пароли не совпадают
-    def test32_standard_reg_invalid_password_confirm_neg(self, web_browser):
-
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+    # 27. Регистрация - некорректные пароли
+    @pytest.mark.parametrize("password", [password_invalid_7, password_invalid_small, password_invalid_caps,
+                                          password_invalid_21])
+    def test27_standard_reg_invalid_passwords_neg(self, web_browser, password):
         page = StartRegPage(web_browser)
         page.btn_standard_auth.click()
         page.btn_to_reg.click()
@@ -917,11 +618,25 @@ class TestRegistration:
         page.name_form.send_keys(name)
         page.lastname_form.send_keys(lastname)
         captcha_search(page)
+        page.email_ad_form.send_keys(gmail_random)
+        page.password_form.send_keys(password)
+        page.password_confirm_form.send_keys(password)
+        assert page.error_reg_forms.is_presented() is True  # отображается сообщение об ошибке
+        code_timer_wait(page)
+        page.btn_reg.click()
+        assert page.h1.get_text() != 'Подтверждение email'
 
+    # 28. Регистрация - введённые пароли не совпадают
+    def test28_standard_reg_invalid_password_confirm_neg(self, web_browser):
+        page = StartRegPage(web_browser)
+        page.btn_standard_auth.click()
+        page.btn_to_reg.click()
+        page.name_form.send_keys(name)
+        page.lastname_form.send_keys(lastname)
+        captcha_search(page)
         page.email_ad_form.send_keys(gmail_random)
         page.password_form.send_keys(valid_password)
         page.password_confirm_form.send_keys(password_invalid_small)
         code_timer_wait(page)
         page.btn_reg.click()
-
         assert page.error_reg_forms.is_presented() is True
