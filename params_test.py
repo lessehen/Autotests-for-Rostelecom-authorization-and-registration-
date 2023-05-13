@@ -1,15 +1,4 @@
-import random
-import string
-import imaplib
-import email
-import re
-
-
-def generate_alphanum_random_string(length):
-    letters_and_digits = string.ascii_lowercase + string.digits
-    rand_string = ''.join(random.sample(letters_and_digits, length))
-    return rand_string
-
+from help_functions import generate_alphanum_random_string
 
 google_email = 'testov.testov.test.test@gmail.com'
 gmail_random = f'testov.testov.test.test+{generate_alphanum_random_string(16)}@gmail.com'
@@ -41,9 +30,6 @@ password_invalid_7 ='&Isuor8'
 password_invalid_small = '&isguorir2t4j'
 password_invalid_caps = '&ISGUORIR2T4J'
 password_invalid_21 = '&IsguorIR2T4J&IsguorI'
-
-imap_server = "imap.mail.ru"
-imap_password = 'nGzAS3hTZCJcnA0rEAWb'
 
 name = 'Иван'
 name_small = 'иван'
@@ -128,25 +114,3 @@ email_1000 = 'u8gtjxvkb17yd82e3vjy27xxtn64gjespcmfvch571nyvtwwq2dtrx0yj6qf1mhbsk
              'we9u93fem9lvl626ugy3qu2mwsb6lp9zeu5i3u2nsgv8l338mfgb00rk515p0pdn7kup5sb86ikncp7at7z2q9xger0foftbc7pciuu' \
              '3moq6hgeekpeov97tcqrt3xrkrdkjddnkex7ijaosu15susza9uvdidu2bo36pfvaltxa7q462npnfa69im8hcj5621xoxjthj5f5yv' \
              'cq2f5frrb6ocjc4v6el9zii4zhrd7r6rvpfyzvdh69ym40ov9ty1xu10k4owvjp6v6@mail.ru'
-
-
-# Вспомогательная функция, получающая код из письма на mail.ru.
-# Оформляла фикстурой, но тогда, насколько я понимаю, код извлекается из письма, которое есть на момент запуска теста.
-# Пробовала останавливать фикстуру через yield и получать код при вызове из теста - не получилось, надо разбираться :)
-# А так вызываем функцию после того, как письмо должно было прийти. Выглядит не очень, но работает, если письмо доходит)
-def code_from_email():
-    imap = imaplib.IMAP4_SSL(imap_server)
-    imap.login(mailru_email, imap_password)
-    imap.select("INBOX")
-    imap.search(None, "All")
-    code_in = str(imap.search(None, "All")[1]).split()[-1].replace("']", "")  # получаем номер последнего письма
-    res, msg = imap.fetch(code_in, '(RFC822)')
-    msg = email.message_from_bytes(msg[0][1])  # извлекаем письмо
-
-    code = ''
-    for part in msg.walk():
-        if part.get_content_maintype() == 'text':
-            text = str(part.get_payload())
-            code = re.search(r'\d{6}', text).group()  # находим код через регулярное выражение
-
-    return code

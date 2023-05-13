@@ -1,7 +1,7 @@
 import pytest
 import time
 from pages.shome_pages import *
-from params import *
+from params_test import *
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
