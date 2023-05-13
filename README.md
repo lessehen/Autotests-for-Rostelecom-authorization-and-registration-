@@ -1,8 +1,10 @@
-# Автотесты для Ростелекома (авторизация и регистрация в личном кабинете пользователя)
+# Автотесты для Ростелекома <br/> (авторизация и регистрация в личном кабинете пользователя)
 
 Итоговый проект по автоматизации тестирования в рамках курса Skillfactory.
 
-Проект выполнен с использованием готовой библиотеки Smart Page Object.
+[Тестовая документация](https://docs.google.com/spreadsheets/d/1GjvSxUXRzA5Rv23GxID3IFa9WvPZGs1j82v-gmGr2TE/edit?usp=sharing)
+---
+Проект выполнен с использованием библиотеки [Smart Page Object](https://github.com/TimurNurlygayanov/ui-tests-example).
 
 Для работы с проектом необходимо установить зависимости, перечисленные в файле requirements.txt (вручную или по команде pip3 install -r requirements).
 
