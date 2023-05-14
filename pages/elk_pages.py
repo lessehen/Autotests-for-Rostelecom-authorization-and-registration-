@@ -9,6 +9,9 @@ class ELKCodeAuthPage(WebPage):
         super().__init__(web_driver, url)
 
     # Берём нужные для тестов элементы страницы из локаторов
+    email_ad_form = email_ad_form
+    phone_ad_form = phone_ad_form
+    btn_get_code = btn_get_code
     btn_standard_auth = btn_standard_auth
     h1 = h1
     code_send = code_send
@@ -20,9 +23,10 @@ class ELKCodeAuthPage(WebPage):
     captcha_form = captcha_form
     user_name = user_name
     cabinet = cabinet
-    btn_logout = btn_logout
+    btn_logout = btn_logout_start
     help_text = help_text
     userpic = userpic
+    btn_edit = btn_edit
     too_many_codes_error = too_many_codes_error
 
 
@@ -55,7 +59,7 @@ class ELKPasswordAuthPage(WebPage):
     tab_ls = tab_ls
     captcha_form = captcha_form
     user_name = user_name
-    btn_logout = btn_logout
+    btn_logout = btn_logout_start
     error_message = error_message
     cabinet = cabinet
     userpic = userpic

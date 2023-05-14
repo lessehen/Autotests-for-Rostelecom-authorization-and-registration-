@@ -1,9 +1,9 @@
 import pytest
-import allure
-import uuid
 from selenium import webdriver
-from pages.start_pages import *
-from pages.key_pages import *
+from pages.start_pages import StartCodeAuthPage
+from pages.elk_pages import ELKCodeAuthPage
+from pages.key_pages import KeyCodeAuthPage
+from pages.onlime_pages import OnlimeCodeAuthPage
 
 
 @pytest.fixture(scope='class')
@@ -20,6 +20,25 @@ def logout_start(web_browser):
     if page.userpic.is_visible():
         page.userpic.click()
         page.btn_logout.click()
+        page.wait_page_loaded()
+
+
+@pytest.fixture(scope='function')
+def logout_elk(web_browser):
+    page = ELKCodeAuthPage(web_browser)
+    yield
+    if page.userpic.is_visible():
+        page.userpic.click()
+        page.btn_logout.click()
+        page.wait_page_loaded()
+
+
+@pytest.fixture(scope='function')
+def logout_onlime(web_browser):
+    page = OnlimeCodeAuthPage(web_browser)
+    yield
+    if page.cabinet.is_visible():
+        page.btn_logout_onlime.click()
         page.wait_page_loaded()
 
 
