@@ -28,13 +28,13 @@ class StartCodeAuthPage(WebPage):
     help_text = help_text
     userpic = userpic
     btn_edit = btn_edit
-    user_data = user_data
     too_many_codes_error = too_many_codes_error
 
 
 class StartPasswordAuthPage(WebPage):
     def __init__(self, web_driver, url=''):
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+        # Загружаем страницу входа по временному коду, потому что постоянную прямую ссылку на нужную добыть не удалось.
+        # К целевой странице далее переходим по кнопкам.
         url = 'https://b2c.passport.rt.ru/auth/realms/b2c/protocol/openid-connect/auth?client_id=lk_decosystems&' \
               'redirect_uri=https://start.rt.ru/&response_type=code&scope=openid&theme=light'
         super().__init__(web_driver, url)
@@ -67,7 +67,6 @@ class StartPasswordAuthPage(WebPage):
     cabinet = cabinet
     userpic = userpic
     btn_edit = btn_edit
-    user_data = user_data
     too_many_codes_error = too_many_codes_error
 
 
@@ -95,7 +94,8 @@ class StartResetPasswordPage(WebPage):
 
 class StartRegPage(WebPage):
     def __init__(self, web_driver, url=''):
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+        # Загружаем страницу входа по временному коду, потому что постоянную прямую ссылку на нужную добыть не удалось.
+        # К целевой странице далее переходим по кнопкам.
         url = 'https://b2c.passport.rt.ru/auth/realms/b2c/protocol/openid-connect/auth?client_id=lk_decosystems&' \
               'redirect_uri=https://start.rt.ru/&response_type=code&scope=openid&theme=light'
         super().__init__(web_driver, url)
@@ -122,7 +122,6 @@ class StartRegPage(WebPage):
     reg_code_send = reg_code_send
     h1 = h1
     error_reg_forms = error_reg_forms
-    name_input = name_input
     user_name = user_name
     userpic = userpic
     code_forms = code_forms

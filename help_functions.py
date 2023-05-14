@@ -8,6 +8,20 @@ import re
 from params_imap import *
 
 
+# Переходим к странице авторизации по паролю
+def to_password_auth(page):
+    page.btn_standard_auth.click()
+    page.wait_page_loaded()
+
+
+# Переходим к странице регистрации
+def to_registration(page):
+    page.btn_standard_auth.click()
+    page.wait_page_loaded()
+    page.btn_to_reg.click()
+    page.wait_page_loaded()
+
+
 # Ищем капчу и пропускаем тест при её наличии (ментор сказал, что отключить её никак низзя, поэтому придумала такой ход)
 def captcha_search(page):
     if page.captcha_form.is_presented():

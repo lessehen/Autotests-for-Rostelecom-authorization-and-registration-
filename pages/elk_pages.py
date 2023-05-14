@@ -112,10 +112,9 @@ class ELKRegPage(WebPage):
     reg_code_send = reg_code_send
     h1 = h1
     error_reg_forms = error_reg_forms
-    name_input = name_input
     user_name = user_name
     userpic = userpic
     code_forms = code_forms
-    btn_logout = btn_logout
+    btn_logout = btn_logout_start
     cabinet = cabinet
     error_popup = error_popup

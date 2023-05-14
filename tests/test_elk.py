@@ -671,7 +671,6 @@ def test16_reg_name_validation_pos(web_browser):
     page.name_form.send_keys(name_small)
     page.lastname_form.click()
     assert page.error_reg_forms.is_presented() is False
-    # assert page.name_input.get_text() == name  # не достаёт текст из поля
 
     # очищаем поле
     page.name_form.clear()
@@ -861,7 +860,6 @@ def test20_reg_lastname_validation_pos(web_browser):
     page.lastname_form.send_keys(lastname_small)
     page.name_form.click()
     assert page.error_reg_forms.is_presented() is False
-    # assert page.name_input.get_text() == name  # не достаёт текст из поля
 
     # очищаем поле
     page.lastname_form.clear()

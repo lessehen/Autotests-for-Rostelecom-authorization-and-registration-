@@ -1,7 +1,5 @@
-import pytest
-import time
 from pages.onlime_pages import *
-from params_test import *
+from functions_fill_fields import *
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -23,12 +21,12 @@ def test01_elements_code_auth(web_browser):
     if page.captcha_form.is_presented():
         pytest.skip("There is CAPTCHA, but I'm a robot")
     else:
-        page.email_ad_form.send_keys(seven_phone)
+        page.email_ad_form.send_keys(seven_phone_plus)
         if page.code_timeout.is_visible():
             time.sleep(int(page.code_timeout.get_text().split()[4]))
         page.btn_get_code.click()
         assert page.h1.get_text() == 'Код подтверждения отправлен' and page.code_send.get_text() == f'По SMS на номер '\
-                                                                                                    f'{seven_phone}'
+                                                                                                    f'{seven_phone_plus}'
         assert page.btn_change_data.is_clickable() and page.btn_change_data.get_text() == 'Изменить номер'
         assert page.code_forms.is_visible() and (page.resend_timeout.is_visible()
                                                  or page.too_many_codes_error.is_visible())
@@ -146,7 +144,7 @@ def test2_email_code_auth_pos(web_browser):
 
 
 # 3. Доступность авторизации по коду на телефон
-@pytest.mark.parametrize("phone", [seven_phone, eight_phone],
+@pytest.mark.parametrize("phone", [seven_phone_plus, eight_phone],
                          ids=["+7x format", "8x format"])
 def test3_phone_code_auth_is_available_pos(web_browser, phone):
 
@@ -167,7 +165,7 @@ def test3_phone_code_auth_is_available_pos(web_browser, phone):
         time.sleep(3)
 
     assert page.h1.get_text() == 'Код подтверждения отправлен'
-    assert page.code_send.get_text() == f'По SMS на номер {seven_phone}'
+    assert page.code_send.get_text() == f'По SMS на номер {seven_phone_plus}'
 
 
 # 4. Авторизация по связке email-пароль - позитивные тесты для популярных почтовых сервисов
@@ -241,7 +239,7 @@ def test6_email_invalid_password_auth_neg(web_browser):
 
 
 # 7. Авторизация по связке телефон-пароль - позитивные тесты
-@pytest.mark.parametrize("phone", [seven_phone, eight_phone],
+@pytest.mark.parametrize("phone", [seven_phone_plus, eight_phone],
                          ids=["+7x format", "8x format"])
 def test7_phone_password_auth_pos(web_browser, phone):
 
@@ -296,7 +294,7 @@ def test9_phone_invalid_password_auth_neg(web_browser):
     page = OnlimePasswordAuthPage(web_browser)
     page.btn_standard_auth.click()
 
-    page.phone_us_form.send_keys(seven_phone)
+    page.phone_us_form.send_keys(seven_phone_plus)
     page.password_form.send_keys(invalid_password)
 
     if page.captcha_form.is_presented():
@@ -404,7 +402,7 @@ def test13_email_reset_password_is_available(web_browser, email):
 
 # 14. Доступность восстановления пароля по коду на телефон
     # Т. к. капчу ввести не можем, проверяем просто, что телефон вводится и кнопка нажимается, без негативных проверок
-@pytest.mark.parametrize("phone", [seven_phone, eight_phone],
+@pytest.mark.parametrize("phone", [seven_phone_plus, eight_phone],
                          ids=["+7x format", "8x format"])
 def test14_phone_reset_password_is_available(web_browser, phone):
 

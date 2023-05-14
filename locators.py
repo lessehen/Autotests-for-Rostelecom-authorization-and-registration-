@@ -8,7 +8,6 @@ password_confirm_form = WebElement(id='password-confirm')
 code_forms = WebElement(id='rt-code-0')
 captcha_form = WebElement(id='captcha')
 name_form = WebElement(name='firstName')
-name_input = WebElement(xpath='/html/body/div[1]/main/section[2]/div/div/div/form/div[1]/div[1]/div/span[1]/span[1]/text()')  # введённое имя
 lastname_form = WebElement(name='lastName')
 region_form = WebElement(xpath='//*[@id="page-right"]/div/div/div/form/div[2]/div/div/div[2]')  # стрелка в поле
 
@@ -32,7 +31,7 @@ btn_logout_start = WebElement(class_name='sc-bnOPBZ.dvyUXv')
 btn_logout_onlime = WebElement(id='logout-btn')
 btn_logout_key = WebElement(class_name='changeUserLink--ecCgz')
 btn_logout_shome = WebElement(class_name='sc-ipEyDJ.jXHLMj.button___3jo3H.button___2W6wR')
-btn_onlime_go = WebElement(xpath='/html/body/div/main/section[2]/div/div')
+btn_onlime_go = WebElement(xpath='//*[@id="page-right"]/div/div/a')
 btn_key_go = WebElement(class_name='redirect--kJuuA')
 btn_edit = WebElement(class_name='sc-cxVPaa.fiyVJD')
 
@@ -52,15 +51,14 @@ login_div = WebElement(class_name='login-form-container')  # форма вход
 login_div_xpath = '/html/body/div[1]/main/section[2]/div'
 reg_div = WebElement(class_name='register-form-container')  # форма регистрации
 terms_of_use = WebElement(class_name='auth-policy')
-terms_of_use_link = WebElement(xpath='/html/body/div[1]/main/section[2]/div/div/div/form/div[5]/a')
+terms_of_use_link = WebElement(xpath='//div[5]/a')
 error_message = WebElement(id='form-error-message')
 error_reg_forms = WebElement(class_name='rt-input-container__meta--error')  # ошибки в форме регистрации
 too_many_codes_error = WebElement(class_name='code-input-container__error')
 cabinet = WebElement(class_name='StyledHeaderTopPartMenuItemLk-kHgfwO')
-cabinet_onlime = WebElement(xpath='/html/body/div/header/div/div[2]/div/div[1]/a[2]')
+cabinet_onlime = WebElement(xpath='//*[@id="lk-btn"]')
 error_popup = WebElement(class_name='card-modal__title')
 captcha_image = WebElement(class_name='rt-captcha__image')
-userpic = WebElement(xpath='/html/body/div[1]/div/div/div[1]/div/div[1]/div[3]/div[2]')
+userpic = WebElement(xpath='//*[@id="root"]/div/div/div[1]/div/div[1]/div[3]/div[2]')
 userpic_shome = WebElement(class_name='profileLink___pMvUU')
 my_home = WebElement(id='go_to_home_1088532')
-user_data = WebElement(xpath='/html/body/div[5]/div[1]/div[2]/div/div/div[2]/div/p[1]')
