@@ -1,5 +1,5 @@
 from pages.start_pages import *
-from functions_fill_fields import *
+from functions.functions_fill_fields import *
 
 # Тесты для "Старт Web" - базовые для этого проекта и лежат в основе всех остальных тестов.
 

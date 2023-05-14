@@ -1,5 +1,5 @@
 from pages.elk_pages import *
-from functions_fill_fields import *
+from functions.functions_fill_fields import *
 
 # В этом файле в комментарии спрятаны все тесты для авторизации по коду, т. к. по требованиям в ЕЛК её быть не должно.
 # А раз так, то лишние тесты не запускаем, чтобы не плодить учётки и не вызывать ограничения типа капчи

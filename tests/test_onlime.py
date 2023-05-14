@@ -1,5 +1,5 @@
 from pages.onlime_pages import *
-from functions_fill_fields import *
+from functions.functions_fill_fields import *
 
 
 # 0. Проверка наличия элементов на страницах и их локаторов.

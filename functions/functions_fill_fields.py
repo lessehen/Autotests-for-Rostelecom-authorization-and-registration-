@@ -1,5 +1,5 @@
-from help_functions import *
-from params_test import *
+from functions.help_functions import *
+from parameters.params_test import *
 
 
 # 1. ПО КОДУ (авторизация и авторегистрация) - в user передаём email или номер телефона

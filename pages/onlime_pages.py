@@ -1,5 +1,5 @@
 from pages.base import WebPage
-from locators import *
+from pages.locators import *
 
 
 class OnlimeCodeAuthPage(WebPage):

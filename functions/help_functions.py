@@ -5,7 +5,7 @@ import random
 import imaplib
 import email
 import re
-from params_imap import *
+from parameters.params_imap import *
 
 
 # Переходим к странице авторизации по паролю

@@ -1,4 +1,4 @@
-from help_functions import generate_alphanum_random_string
+from functions.help_functions import generate_alphanum_random_string
 
 valid_password = '&IsguorIR2T4J'
 
