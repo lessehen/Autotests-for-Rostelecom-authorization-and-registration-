@@ -37,11 +37,11 @@
 ### Вспомогательные файлы
 
 1. В папке [pages](pages) располагаются файлы с описанием [базового класса страницы](pages/base.py), вспомогательных классов для определения [веб-элементов](pages/elements.py), [локаторов используемых элементов](pages/locators.py) и классов целевых страниц:
-* * [ЕЛК Web](pages/elk_pages.py)
-* * [Старт Web](pages/start_pages.py)
-* * [Онлайм Web](pages/onlime_pages.py)
-* * [Умный дом Web](pages/shome_pages.py)
-* * [Ключ Web](pages/key_pages.py)
+* * [Старт Web](pages/start_pages.py),
+* * [ЕЛК Web](pages/elk_pages.py),
+* * [Онлайм Web](pages/onlime_pages.py),
+* * [Ключ Web](pages/key_pages.py),
+* * [Умный дом Web](pages/shome_pages.py).
 
 2. Папка [functions](functions) содержит:
 * * Файл [help_functions](functions/help_functions.py), в котором задаются несколько небольших вспомогательных функций, многократно использующихся в тестах.
