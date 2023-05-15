@@ -32,7 +32,7 @@ class SHomeCodeAuthPage(WebPage):
 
 class SHomePasswordAuthPage(WebPage):
     def __init__(self, web_driver, url=''):
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+        # Загружаем страницу входа по временному коду, к целевой странице переходим по кнопкам
         url = 'https://b2c.passport.rt.ru/auth/realms/b2c/protocol/openid-connect/auth?client_id=lk_smarthome&' \
               'response_type=code&scope=openid&redirect_uri=https%3A%2F%2Flk.smarthome.rt.ru%2Foauth2%2Fcallback'
         super().__init__(web_driver, url)
@@ -91,7 +91,7 @@ class SHomeResetPasswordPage(WebPage):
 
 class SHomeRegPage(WebPage):
     def __init__(self, web_driver, url=''):
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+        # Загружаем страницу входа по временному коду, к целевой странице переходим по кнопкам
         url = 'https://b2c.passport.rt.ru/auth/realms/b2c/protocol/openid-connect/auth?client_id=lk_smarthome&' \
               'response_type=code&scope=openid&redirect_uri=https%3A%2F%2Flk.smarthome.rt.ru%2Foauth2%2Fcallback'
         super().__init__(web_driver, url)

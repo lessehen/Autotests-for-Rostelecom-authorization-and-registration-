@@ -8,7 +8,7 @@ from functions.functions_fill_fields import *
 
 
 # 0. Проверка наличия элементов на страницах и их локаторов.
-class TestElementsPresence:
+class TestELKElementsPresence:
     """
     # 0.1. Для страницы авторизации по коду
     @pytest.mark.xfail(reason='Падает, если исчерпаны отправки кода за сутки')
@@ -94,7 +94,7 @@ class TestElementsPresence:
 
 """
 # 1. Тесты для формы входа по быстрому коду
-class TestCodeAuthReg:
+class TestELKCodeAuthReg:
     # 1.1. Доступность авторизации по коду на email - позитивные тесты для популярных почтовых сервисов.
     # Mail.ru в отдельном тесте с полным сценарием авторизации.
     @pytest.mark.parametrize("email", [google_email, yandex_email],
@@ -158,7 +158,7 @@ class TestCodeAuthReg:
 
 
 # 2. Тесты для авторизации с использованием пароля
-class TestPassAuth:
+class TestELKPassAuth:
     # 2.1. Авторизация по связке email-пароль - позитивные тесты для популярных почтовых сервисов
     @pytest.mark.parametrize("email", [google_email, mailru_email, yandex_email],
                              ids=["gmail", "mailru", "yandex"])
@@ -230,7 +230,7 @@ class TestPassAuth:
 
 
 # 3. Тесты для регистрации
-class TestRegistration:
+class TestELKRegistration:
     # 3.1. Регистрация - позитивные тесты для популярных почтовых сервисов. Mail.ru отдельно с полным сценарием
     @pytest.mark.parametrize("email", [gmail_random, yandex_random],
                              ids=["gmail", "yandex"])
@@ -387,7 +387,7 @@ class TestRegistration:
 
 
 # 4. Тесты для страницы восстановления пароля
-class TestResetPass:
+class TestELKResetPass:
     # 4.1. Доступность восстановления пароля по коду на email
     # Т. к. капчу ввести не можем, проверяем просто, что почта вводится и кнопка нажимается
     # Тест по большому счёту бессмысленный, но если вдруг отключат капчу, его можно было бы быстро допилить до рабочего

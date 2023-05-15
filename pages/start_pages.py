@@ -94,8 +94,7 @@ class StartResetPasswordPage(WebPage):
 
 class StartRegPage(WebPage):
     def __init__(self, web_driver, url=''):
-        # Загружаем страницу входа по временному коду, потому что постоянную прямую ссылку на нужную добыть не удалось.
-        # К целевой странице далее переходим по кнопкам.
+        # Загружаем страницу входа по временному коду, к целевой странице переходим по кнопкам
         url = 'https://b2c.passport.rt.ru/auth/realms/b2c/protocol/openid-connect/auth?client_id=lk_decosystems&' \
               'redirect_uri=https://start.rt.ru/&response_type=code&scope=openid&theme=light'
         super().__init__(web_driver, url)

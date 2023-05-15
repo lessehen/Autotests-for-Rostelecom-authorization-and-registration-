@@ -12,11 +12,12 @@ yandex_email = 'test.test.testov.testov@yandex.ru'
 yandex_random = f'test.test.testov.testov+{generate_alphanum_random_string(16)}@yandex.ru'
 
 seven_phone_plus = '+7 913 982-32-85'
-seven_phone_without_plus = '7 913 982-32-85'
+seven_phone_without_plus = '79139823285'
 eight_phone = '8 913 982-32-85'
 invalid_phone_11 = '12345678910'
 invalid_phone_10 = '7345678910'
 invalid_phone_12 = '792345678910'
+phone_shome_reg = '+7 913 000-00-00'
 phone_for_key = '79538853278'
 
 login_valid = 'rtkid_1681039760749'

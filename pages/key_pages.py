@@ -34,7 +34,7 @@ class KeyCodeAuthPage(WebPage):
 
 class KeyPasswordAuthPage(WebPage):
     def __init__(self, web_driver, url=''):
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+        # Загружаем страницу входа по временному коду, к целевой странице переходим по кнопкам
         url = 'https://b2c.passport.rt.ru/auth/realms/b2c/protocol/openid-connect/auth?client_id=lk_dmh&redirect_uri=' \
               'https://sso.key.rt.ru/api/v1/oauth2/b2c/callback&response_type=code&state=aHR0cHM6Ly9rZXkucnQucnUvbWF' \
               'pbi9zaWduaW4/dD0xNjgxNDczMzM0MTU3'
@@ -95,7 +95,7 @@ class KeyResetPasswordPage(WebPage):
 
 class KeyRegPage(WebPage):
     def __init__(self, web_driver, url=''):
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+        # Загружаем страницу входа по временному коду, к целевой странице переходим по кнопкам
         url = 'https://b2c.passport.rt.ru/auth/realms/b2c/protocol/openid-connect/auth?client_id=lk_dmh&redirect_uri=' \
               'https://sso.key.rt.ru/api/v1/oauth2/b2c/callback&response_type=code&state=aHR0cHM6Ly9rZXkucnQucnUvbWF' \
               'pbi9zaWduaW4/dD0xNjgxNDczMzM0MTU3'

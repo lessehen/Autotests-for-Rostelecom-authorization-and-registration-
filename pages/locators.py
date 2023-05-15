@@ -30,7 +30,7 @@ btn_reg = WebElement(name='register')  # кнопка "зарегистриро�
 btn_logout_start = WebElement(class_name='sc-bnOPBZ.dvyUXv')
 btn_logout_onlime = WebElement(id='logout-btn')
 btn_logout_key = WebElement(class_name='changeUserLink--ecCgz')
-btn_logout_shome = WebElement(class_name='sc-ipEyDJ.jXHLMj.button___3jo3H.button___2W6wR')
+btn_logout_shome = WebElement(xpath='//*[@id="root"]/div/div/div[2]/div/section/div[4]/button/span')
 btn_onlime_go = WebElement(xpath='//*[@id="page-right"]/div/div/a')
 btn_key_go = WebElement(class_name='redirect--kJuuA')
 btn_edit = WebElement(class_name='sc-cxVPaa.fiyVJD')

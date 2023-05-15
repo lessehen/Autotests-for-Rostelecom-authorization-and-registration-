@@ -8,7 +8,7 @@ from functions.functions_fill_fields import *
 # Внутри одного теста проверяется наличие / кликабельность всех необходимых элементов. Идея была в том, что перед
 # запуском самих тестовых сценариев можно быстро проверить элементы, чтобы пофиксить локаторы, если они изменились.
 # Раскладывать на отдельные тесты смысла особого не увидела, потому что сомневаюсь, что могут сломать всё и сразу :)
-class TestElementsPresence:
+class TestStartElementsPresence:
     # 0.1. Для страницы авторизации по коду
     @pytest.mark.xfail(reason='Падает, если исчерпаны отправки кода за сутки')
     def test01_elements_code_auth(self, web_browser):
@@ -91,7 +91,7 @@ class TestElementsPresence:
 
 
 # 1. Тесты для формы входа по быстрому коду
-class TestCodeAuthReg:
+class TestStartCodeAuthReg:
     # 1.1. Доступность авторизации по коду на email - позитивные тесты для популярных почтовых сервисов.
     # Mail.ru в отдельном тесте с полным сценарием авторизации.
     @pytest.mark.parametrize("email", [google_email, yandex_email],
@@ -157,7 +157,7 @@ class TestCodeAuthReg:
 
 
 # 2. Тесты для авторизации с использованием пароля
-class TestPassAuth:
+class TestStartPassAuth:
     # 2.1. Авторизация по связке email-пароль - позитивные тесты для популярных почтовых сервисов
     @pytest.mark.parametrize("email", [google_email, mailru_email, yandex_email],
                              ids=["gmail", "mailru", "yandex"])
@@ -229,7 +229,7 @@ class TestPassAuth:
 
 
 # 3. Тесты для регистрации
-class TestRegistration:
+class TestStartRegistration:
     # 3.1. Регистрация - позитивные тесты для популярных почтовых сервисов. Mail.ru отдельно с полным сценарием
     @pytest.mark.parametrize("email", [gmail_random, yandex_random],
                              ids=["gmail", "yandex"])
@@ -392,7 +392,7 @@ class TestRegistration:
 
 
 # 4. Тесты для страницы восстановления пароля
-class TestResetPass:
+class TestStartResetPass:
     # 4.1. Доступность восстановления пароля по коду на email
     # Т. к. капчу ввести не можем, проверяем просто, что почта вводится и кнопка нажимается
     # Тест по большому счёту бессмысленный, но если вдруг отключат капчу, его можно было бы быстро допилить до рабочего

@@ -3,7 +3,7 @@ from functions.functions_fill_fields import *
 
 
 # 0. Проверка наличия элементов на страницах и их локаторов.
-class TestElementsPresence:
+class TestOnlimeElementsPresence:
     # 0.1. Для страницы авторизации по коду
     @pytest.mark.xfail(reason='Падает, если исчерпаны отправки кода за сутки')
     def test01_elements_code_auth(self, web_browser):
@@ -70,7 +70,7 @@ class TestElementsPresence:
 
 
 # 1. Тесты для формы входа по быстрому коду
-class TestCodeAuthReg:
+class TestOnlimeCodeAuthReg:
     # 1.1. Доступность авторизации по коду на email - позитивные тесты для популярных почтовых сервисов.
     # Mail.ru в отдельном тесте с полным сценарием авторизации.
     @pytest.mark.parametrize("email", [google_email, yandex_email],
@@ -103,7 +103,7 @@ class TestCodeAuthReg:
 
 
 # 2. Тесты для авторизации с использованием пароля
-class TestPassAuth:
+class TestOnlimePassAuth:
     # 2.1. Авторизация по связке email-пароль - позитивные тесты для популярных почтовых сервисов
     @pytest.mark.parametrize("email", [google_email, mailru_email, yandex_email],
                              ids=["gmail", "mailru", "yandex"])
@@ -175,7 +175,7 @@ class TestPassAuth:
 
 
 # 3. Тесты для страницы восстановления пароля
-class TestResetPass:
+class TestOnlimeResetPass:
     # 3.1. Доступность восстановления пароля по коду на email
     # Т. к. капчу ввести не можем, проверяем просто, что почта вводится и кнопка нажимается
     @pytest.mark.parametrize("email", [google_email, mailru_email, yandex_email],

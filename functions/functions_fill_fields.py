@@ -137,6 +137,108 @@ def reg_fill_fields_confirm_password(page, valid_password, invalid_password):
     page.wait_page_loaded()
 
 
+# 3.8. SHOME - ТЕЛЕФОН - заполняем и отправляем форму:
+def shome_reg_fill_fields_phone(page, phone):
+    to_registration(page)
+    page.name_form.send_keys(name)
+    page.lastname_form.send_keys(lastname)
+    captcha_search(page)
+    page.phone_ad_form.send_keys(phone)
+    page.password_form.send_keys(valid_password)
+    page.password_confirm_form.send_keys(valid_password)
+    code_timer_wait(page)
+    page.btn_reg.click()
+    page.wait_page_loaded()
+
+
+# 3.9. SHOME - ИМЕНА - заполняем и отправляем форму, меняя имя (позитивные - с неполным сценарием):
+def shome_reg_fill_fields_names_pos(page, name):
+    to_registration(page)
+    page.name_form.send_keys(name)
+    page.lastname_form.send_keys(lastname)
+    captcha_search(page)
+    page.phone_ad_form.send_keys(phone_shome_reg)
+    page.password_form.send_keys(valid_password)
+    page.password_confirm_form.send_keys(valid_password)
+    # Код закрыт, чтобы не создавать кучу учёток, которые не получится удалить
+    # assert page.error_reg_forms.is_presented() is False
+    # code_timer_wait(page)
+    # page.btn_reg.click()
+    # page.wait_page_loaded()
+
+
+# 3.10. SHOME - ИМЕНА - заполняем и отправляем форму, меняя имя (негативные - с полным сценарием):
+def shome_reg_fill_fields_names_neg(page, name):
+    to_registration(page)
+    page.name_form.send_keys(name)
+    page.lastname_form.send_keys(lastname)
+    captcha_search(page)
+    page.phone_ad_form.send_keys(phone_shome_reg)
+    page.password_form.send_keys(valid_password)
+    page.password_confirm_form.send_keys(valid_password)
+    code_timer_wait(page)
+    page.btn_reg.click()
+    page.wait_page_loaded()
+
+
+# 3.11. SHOME - ФАМИЛИИ - заполняем и отправляем форму, меняя фамилию (позитивные - с неполным сценарием):
+def shome_reg_fill_fields_lastnames_pos(page, lastname):
+    to_registration(page)
+    page.name_form.send_keys(name)
+    page.lastname_form.send_keys(lastname)
+    captcha_search(page)
+    page.phone_ad_form.send_keys(phone_shome_reg)
+    page.password_form.send_keys(valid_password)
+    page.password_confirm_form.send_keys(valid_password)
+    # Код закрыт, чтобы не создавать кучу учёток, которые не получится удалить
+    # assert page.error_reg_forms.is_presented() is False
+    # code_timer_wait(page)
+    # page.btn_reg.click()
+    # page.wait_page_loaded()
+
+
+# 3.12. SHOME - ФАМИЛИИ - заполняем и отправляем форму, меняя фамилию (негативные - с полным сценарием):
+def shome_reg_fill_fields_lastnames_neg(page, lastname):
+    to_registration(page)
+    page.name_form.send_keys(name)
+    page.lastname_form.send_keys(lastname)
+    captcha_search(page)
+    page.phone_ad_form.send_keys(phone_shome_reg)
+    page.password_form.send_keys(valid_password)
+    page.password_confirm_form.send_keys(valid_password)
+    code_timer_wait(page)
+    page.btn_reg.click()
+    page.wait_page_loaded()
+
+
+# 3.13. SHOME - ПАРОЛИ - заполняем и отправляем форму, меняя пароль:
+def shome_reg_fill_fields_password(page, password):
+    to_registration(page)
+    page.name_form.send_keys(name)
+    page.lastname_form.send_keys(lastname)
+    captcha_search(page)
+    page.phone_ad_form.send_keys(phone_shome_reg)
+    page.password_form.send_keys(password)
+    page.password_confirm_form.send_keys(password)
+    code_timer_wait(page)
+    page.btn_reg.click()
+    page.wait_page_loaded()
+
+
+# 3.14. SHOME - ПАРОЛИ НЕ СОВПАДАЮТ:
+def shome_reg_fill_fields_confirm_password(page, valid_password, invalid_password):
+    to_registration(page)
+    page.name_form.send_keys(name)
+    page.lastname_form.send_keys(lastname)
+    captcha_search(page)
+    page.phone_ad_form.send_keys(phone_shome_reg)
+    page.password_form.send_keys(valid_password)
+    page.password_confirm_form.send_keys(invalid_password)
+    code_timer_wait(page)
+    page.btn_reg.click()
+    page.wait_page_loaded()
+
+
 # 4. ВОССТАНОВЛЕНИЕ ПАРОЛЯ - в user передаём email или номер телефона
 def reset_pass_fill_fields(page, user):
     page.email_us_form.send_keys(user)

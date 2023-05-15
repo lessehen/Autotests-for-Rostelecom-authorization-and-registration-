@@ -32,7 +32,7 @@ class ELKCodeAuthPage(WebPage):
 
 class ELKPasswordAuthPage(WebPage):
     def __init__(self, web_driver, url=''):
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+        # Загружаем страницу входа по временному коду, к целевой странице переходим по кнопкам
         url = 'https://lk.rt.ru/'
         super().__init__(web_driver, url)
 
@@ -90,7 +90,7 @@ class ELKResetPasswordPage(WebPage):
 
 class ELKRegPage(WebPage):
     def __init__(self, web_driver, url=''):
-        # Загружаем страницу входа по временному коду, потому что прямую ссылку на нужную добыть не удалось
+        # Загружаем страницу входа по временному коду, к целевой странице переходим по кнопкам
         url = 'https://lk.rt.ru/'
         super().__init__(web_driver, url)
 

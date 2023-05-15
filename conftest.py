@@ -4,6 +4,7 @@ from pages.start_pages import StartCodeAuthPage
 from pages.elk_pages import ELKCodeAuthPage
 from pages.key_pages import KeyCodeAuthPage
 from pages.onlime_pages import OnlimeCodeAuthPage
+from pages.shome_pages import SHomePasswordAuthPage
 
 
 @pytest.fixture(scope='class')
@@ -47,6 +48,16 @@ def logout_onlime(web_browser):
 def pre_logout_key(web_browser):
     page = KeyCodeAuthPage(web_browser)
     if page.btn_logout.is_visible():
+        page.btn_logout.click()
+        page.wait_page_loaded()
+
+
+@pytest.fixture(scope='function')
+def logout_shome(web_browser):
+    page = SHomePasswordAuthPage(web_browser)
+    yield
+    if page.cabinet.is_visible():
+        page.userpic.click()
         page.btn_logout.click()
         page.wait_page_loaded()
 
