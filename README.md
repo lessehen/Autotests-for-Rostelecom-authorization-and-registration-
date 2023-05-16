@@ -1,10 +1,24 @@
 # Автотесты для Ростелекома <br/> (авторизация и регистрация в личном кабинете)
 
-Итоговый проект по автоматизации тестирования в рамках курса Skillfactory.
+Итоговый проект по автоматизации тестирования в рамках курса Skillfactory "Тестировщик-автоматизатор на Python".
 
-[Тестовая документация](https://docs.google.com/spreadsheets/d/1GjvSxUXRzA5Rv23GxID3IFa9WvPZGs1j82v-gmGr2TE/edit?usp=sharing)
+### [Тестовая документация](https://docs.google.com/spreadsheets/d/1GjvSxUXRzA5Rv23GxID3IFa9WvPZGs1j82v-gmGr2TE/edit?usp=sharing) 
+(представлена в Google Таблице)
+
+Содержит:
+1. [Формулировку задания](https://docs.google.com/spreadsheets/d/1GjvSxUXRzA5Rv23GxID3IFa9WvPZGs1j82v-gmGr2TE/edit#gid=0&range=A1)
+2. [Тест-план](https://docs.google.com/spreadsheets/d/1GjvSxUXRzA5Rv23GxID3IFa9WvPZGs1j82v-gmGr2TE/edit#gid=157287475&range=A1:B1)
+3. [Анализ требований](https://docs.google.com/spreadsheets/d/1GjvSxUXRzA5Rv23GxID3IFa9WvPZGs1j82v-gmGr2TE/edit#gid=1466244955&range=A1:E1)
+4. [Ссылку на диаграммы состояний и переходов](https://docs.google.com/spreadsheets/d/1GjvSxUXRzA5Rv23GxID3IFa9WvPZGs1j82v-gmGr2TE/edit#gid=1236165433&range=A1)
+5. [Чек-листы наличия элементов](https://docs.google.com/spreadsheets/d/1GjvSxUXRzA5Rv23GxID3IFa9WvPZGs1j82v-gmGr2TE/edit#gid=309111003&range=A1:C1)
+6. [Таблицы атомарных проверок](https://docs.google.com/spreadsheets/d/1GjvSxUXRzA5Rv23GxID3IFa9WvPZGs1j82v-gmGr2TE/edit#gid=1053114781&range=A1:H1)
+7. [Тест-кейсы](https://docs.google.com/spreadsheets/d/1GjvSxUXRzA5Rv23GxID3IFa9WvPZGs1j82v-gmGr2TE/edit#gid=1396594510&range=A3) (гибрид с чек-листом)
+8. [Результаты тестирования](https://docs.google.com/spreadsheets/d/1GjvSxUXRzA5Rv23GxID3IFa9WvPZGs1j82v-gmGr2TE/edit#gid=243923723&range=A1:C1)
+9. [Оценку ментора курса](https://docs.google.com/spreadsheets/d/1GjvSxUXRzA5Rv23GxID3IFa9WvPZGs1j82v-gmGr2TE/edit#gid=1829162515&range=1:1)
+
+
 ---
-
+## Автотесты
 Проект выполнен с использованием библиотеки [Smart Page Object](https://github.com/TimurNurlygayanov/ui-tests-example).
 
 Для работы с проектом необходимо установить зависимости, перечисленные в файле [requirements.txt](requirements.txt):
