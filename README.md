@@ -23,7 +23,7 @@
 
 Для работы с проектом необходимо установить зависимости, перечисленные в файле [requirements.txt](requirements.txt):
 
-    pip3 install -r requirements
+    pip3 install -r requirements.txt
     
 ---
 
