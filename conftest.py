@@ -8,7 +8,7 @@ from pages.shome_pages import SHomePasswordAuthPage
 
 
 @pytest.fixture(scope='class')
-def web_browser(request):
+def web_browser():
     driver = webdriver.Chrome('chromedriver112.exe')
     yield driver
     driver.quit()
