@@ -1,17 +1,40 @@
 import pytest
 from selenium import webdriver
-from pages.start_pages import StartCodeAuthPage
+from pages.start_pages import *
 from pages.elk_pages import ELKCodeAuthPage
 from pages.key_pages import KeyCodeAuthPage
 from pages.onlime_pages import OnlimeCodeAuthPage
 from pages.shome_pages import SHomePasswordAuthPage
+from functions.help_functions import to_password_auth, to_registration
 
 
 @pytest.fixture(scope='class')
-def web_browser(request):
+def web_browser():
     driver = webdriver.Chrome('chromedriver112.exe')
     yield driver
     driver.quit()
+
+
+@pytest.fixture(scope='class')
+def init_start_code_auth_page(request, web_browser):
+    request.cls.page = StartCodeAuthPage(web_browser)
+
+
+@pytest.fixture(scope='class')
+def init_start_pass_auth_page(request, web_browser):
+    request.cls.page = StartPasswordAuthPage(web_browser)
+    to_password_auth(request.cls.page)
+
+
+@pytest.fixture(scope='class')
+def init_start_reg_page(request, web_browser):
+    request.cls.page = StartRegPage(web_browser)
+    to_registration(request.cls.page)
+
+
+@pytest.fixture(scope='class')
+def init_start_reset_pass_page(request, web_browser):
+    request.cls.page = StartResetPasswordPage(web_browser)
 
 
 @pytest.fixture(scope='function')

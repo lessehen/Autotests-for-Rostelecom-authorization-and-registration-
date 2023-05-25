@@ -3,91 +3,166 @@ from functions.functions_fill_fields import *
 
 # Тесты для "Старт Web" - базовые для этого проекта и лежат в основе всех остальных тестов.
 
+# Сначала "нулевые" тесты - проверка наличия элементов на страницах. Идея в том, чтобы перед запуском самих тестовых
+# сценариев быстро проверить элементы и пофиксить локаторы, если они изменились.
 
-# 0. Проверка наличия элементов на страницах и их локаторов.
-# Внутри одного теста проверяется наличие / кликабельность всех необходимых элементов. Идея была в том, что перед
-# запуском самих тестовых сценариев можно быстро проверить элементы, чтобы пофиксить локаторы, если они изменились.
-# Раскладывать на отдельные тесты смысла особого не увидела, потому что сомневаюсь, что могут сломать всё и сразу :)
-class TestStartElementsPresence:
-    # 0.1. Для страницы авторизации по коду
-    @pytest.mark.xfail(reason='Падает, если исчерпаны отправки кода за сутки')
-    def test01_elements_code_auth(self, web_browser):
-        page = StartCodeAuthPage(web_browser)  # Загружаем страницу и проверяем её элементы
-        assert page.h1.get_text() == 'Авторизация по коду'
-        assert 'Укажите' in page.help_text.get_text()
-        assert page.email_ad_form.is_visible()
-        assert page.btn_get_code.is_clickable() and page.btn_get_code.get_text() == 'Получить код'
-        assert page.btn_standard_auth.is_clickable() and page.btn_standard_auth.get_text() == 'Войти с паролем'
-        code_auth_fill_fields(page, seven_phone_plus)  # Заполняем и отправляем форму, используя номер телефона
-        assert page.h1.get_text() == 'Код подтверждения отправлен' and page.code_send.get_text() == f'По SMS на номер '\
-                                                                                                    f'{seven_phone_plus}'
-        assert page.btn_change_data.is_clickable() and page.btn_change_data.get_text() == 'Изменить номер'
-        assert page.code_forms.is_visible() and (page.resend_timeout.is_visible()
-                                                 or page.too_many_codes_error.is_visible())
-        resend_timer_wait(page)
-        assert page.btn_resend_code.is_clickable()
+
+# 0.1. Наличие элементов для страницы авторизации по коду
+@pytest.mark.usefixtures('init_start_code_auth_page')
+class TestStartCodeAuthElementsPresence:
+    def test01_1_h1_code_auth(self):
+        assert self.page.h1.get_text() == 'Авторизация по коду'
+
+    def test01_2_help_text_code_auth(self):
+        assert 'Укажите' in self.page.help_text.get_text()
+
+    def test01_3_email_ad_form_code_auth(self):
+        assert self.page.email_ad_form.is_visible()
+
+    def test01_4_btn_getcode_code_auth(self):
+        assert self.page.btn_get_code.is_clickable() and self.page.btn_get_code.get_text() == 'Получить код'
+
+    def test01_5_btn_standard_auth_code_auth(self):
+        assert self.page.btn_standard_auth.is_clickable() \
+               and self.page.btn_standard_auth.get_text() == 'Войти с паролем'
+
+    def test01_6_phone_code_auth(self):
+        code_auth_fill_fields(self.page, seven_phone_plus)  # Заполняем и отправляем форму, используя номер телефона
+        assert self.page.h1.get_text() == 'Код подтверждения отправлен' \
+               and self.page.code_send.get_text() == f'По SMS на номер {seven_phone_plus}'
+        assert self.page.btn_change_data.is_clickable() and self.page.btn_change_data.get_text() == 'Изменить номер'
+        assert self.page.code_forms.is_visible() and (self.page.resend_timeout.is_visible()
+                                                      or self.page.too_many_codes_error.is_visible())
+        resend_timer_wait(self.page)
+        assert self.page.btn_resend_code.is_clickable()
+        # По требованиям должна быть надпись, на самом деле нет. На функционал не влияет, поэтому проверку спрятала:
+        # assert page.btn_resend_code.get_text() == 'Получить новый код'
+        self.page.btn_change_data.click()  # Возвращаемся на стартовую страницу
+
+    def test01_7_email_code_auth(self):
+        assert self.page.h1.get_text() == 'Авторизация по коду'
+        code_auth_fill_fields(self.page, google_email)  # Заполняем и отправляем форму, используя email
+        assert self.page.h1.get_text() == 'Код подтверждения отправлен' \
+               and self.page.code_send.get_text() == f'На почту {google_email}'
+        assert self.page.btn_change_data.is_clickable() and self.page.btn_change_data.get_text() == 'Изменить почту'
+        assert self.page.code_forms.is_visible() and (self.page.resend_timeout.is_visible()
+                                                      or self.page.too_many_codes_error.is_visible())
+        resend_timer_wait(self.page)
+        assert self.page.btn_resend_code.is_clickable()
         # По требованиям должна быть надпись, на самом деле нет. На функционал не влияет, поэтому проверку спрятала:
         # assert page.btn_resend_code.get_text() == 'Получить новый код'
 
-        page.btn_change_data.click()  # Возвращаемся на стартовую страницу
-        assert page.h1.get_text() == 'Авторизация по коду'
-        code_auth_fill_fields(page, google_email)  # Заполняем и отправляем форму, используя email
-        assert page.h1.get_text() == 'Код подтверждения отправлен' \
-               and page.code_send.get_text() == f'На почту {google_email}'
-        assert page.btn_change_data.is_clickable() and page.btn_change_data.get_text() == 'Изменить почту'
-        assert page.code_forms.is_visible() and (page.resend_timeout.is_visible()
-                                                 or page.too_many_codes_error.is_visible())
-        resend_timer_wait(page)
-        assert page.btn_resend_code.is_clickable()
-        # По требованиям должна быть надпись, на самом деле нет. На функционал не влияет, поэтому проверку спрятала:
-        # assert page.btn_resend_code.get_text() == 'Получить новый код'
 
-    # 0.2. Для авторизации с паролем
-    def test02_elements_password_auth(self, web_browser):
-        page = StartPasswordAuthPage(web_browser)
-        to_password_auth(page)
-        assert page.h1.get_text() == 'Авторизация'
-        assert page.left_block.is_presented() and page.right_block.is_presented()
-        assert page.rit_tagline.is_presented()
-        assert page.login_div.is_visible()
-        assert page.tab_phone.is_clickable() and page.tab_phone.get_text() == 'Телефон'
-        assert page.tab_email.is_clickable() and page.tab_email.get_text() == 'Почта'
-        assert page.tab_login.is_clickable() and page.tab_login.get_text() == 'Логин'
-        assert page.tab_ls.is_clickable() and page.tab_ls.get_text() == 'Лицевой счёт'
-        assert page.login_us_form.is_visible() and page.password_form.is_visible()
-        assert page.btn_login.is_clickable() and page.btn_login.get_text() == 'Войти'
-        assert page.btn_back_code.is_clickable() and page.btn_back_code.get_text() == 'Войти по временному коду'
-        assert page.btn_forgot_password.is_clickable() and page.btn_forgot_password.get_text() == 'Забыл пароль'
-        assert page.btn_to_reg.is_clickable() and page.btn_to_reg.get_text() == 'Зарегистрироваться'
+# 0.2. Наличие элементов для страницы авторизации с паролем
+@pytest.mark.usefixtures('init_start_pass_auth_page')
+class TestStartPasswordAuthElementsPresence:
+    def test02_1_h1_password_auth(self):
+        assert self.page.h1.get_text() == 'Авторизация'
 
-    # 0.3. Для восстановления пароля
-    def test03_elements_reset_password(self, web_browser):
-        page = StartResetPasswordPage(web_browser)
-        assert page.h1.get_text() == 'Восстановление пароля'
-        assert page.tab_phone.is_clickable() and page.tab_phone.get_text() == 'Телефон'
-        assert page.tab_email.is_clickable() and page.tab_email.get_text() == 'Почта'
-        assert page.tab_login.is_clickable() and page.tab_login.get_text() == 'Логин'
-        assert page.tab_ls.is_clickable() and page.tab_ls.get_text() == 'Лицевой счёт'
-        assert page.email_us_form.is_visible()
-        assert page.captcha_form.is_visible() and page.captcha_image.is_visible()
-        assert page.btn_reset.is_clickable() and page.btn_reset.get_text() == 'Продолжить'
-        assert page.btn_reset_back.is_clickable() and 'Вернуться' in page.btn_reset_back.get_text()
+    def test02_2_blocks_password_auth(self):
+        assert self.page.left_block.is_presented() and self.page.right_block.is_presented()
 
-    # 0.4. Для страницы регистрации
-    def test04_elements_st_reg(self, web_browser):
-        page = StartRegPage(web_browser)
-        to_registration(page)
-        assert page.h1.get_text() == 'Регистрация'
-        assert page.left_block.is_presented() and page.right_block.is_presented()
-        # assert page.rit_tagline.is_visible()  # скрыт, т. к. сейчас элемента нет, баг, но на функционал не влияет
-        assert page.reg_div.is_visible()
-        assert page.name_form.is_visible() and page.lastname_form.is_visible()
-        assert page.region_form.is_visible()
-        assert page.email_ad_form.is_visible()
-        assert page.password_form.is_visible() and page.password_confirm_form.is_visible()
-        assert page.btn_reg.is_clickable() and page.btn_reg.get_text() == 'Зарегистрироваться'
+    def test02_3_tagline_password_auth(self):
+        assert self.page.rit_tagline.is_presented()
+
+    def test02_4_login_div_password_auth(self):
+        assert self.page.login_div.is_visible()
+
+    def test02_5_phone_tab_password_auth(self):
+        assert self.page.tab_phone.is_clickable() and self.page.tab_phone.get_text() == 'Телефон'
+
+    def test02_6_email_tab_password_auth(self):
+        assert self.page.tab_email.is_clickable() and self.page.tab_email.get_text() == 'Почта'
+
+    def test02_7_login_tab_password_auth(self):
+        assert self.page.tab_login.is_clickable() and self.page.tab_login.get_text() == 'Логин'
+
+    def test02_8_ls_tab_password_auth(self):
+        assert self.page.tab_ls.is_clickable() and self.page.tab_ls.get_text() == 'Лицевой счёт'
+
+    def test02_9_login_form_password_auth(self):
+        assert self.page.login_us_form.is_visible() and self.page.password_form.is_visible()
+
+    def test02_10_login_btn_password_auth(self):
+        assert self.page.btn_login.is_clickable() and self.page.btn_login.get_text() == 'Войти'
+
+    def test02_11_code_btn_password_auth(self):
+        assert self.page.btn_back_code.is_clickable() \
+               and self.page.btn_back_code.get_text() == 'Войти по временному коду'
+
+    def test02_12_forgot_btn_password_auth(self):
+        assert self.page.btn_forgot_password.is_clickable() \
+               and self.page.btn_forgot_password.get_text() == 'Забыл пароль'
+
+    def test02_13_reg_btn_password_auth(self):
+        assert self.page.btn_to_reg.is_clickable() and self.page.btn_to_reg.get_text() == 'Зарегистрироваться'
+
+
+# 0.3. Наличие элементов для страницы сброса пароля
+@pytest.mark.usefixtures('init_start_reset_pass_page')
+class TestStartResetPasswordElementsPresence:
+    def test03_1_h1_reset_password(self):
+        assert self.page.h1.get_text() == 'Восстановление пароля'
+
+    def test03_2_phone_tab_reset_password(self):
+        assert self.page.tab_phone.is_clickable() and self.page.tab_phone.get_text() == 'Телефон'
+
+    def test03_3_email_tab_reset_password(self):
+        assert self.page.tab_email.is_clickable() and self.page.tab_email.get_text() == 'Почта'
+
+    def test03_4_login_tab_reset_password(self):
+        assert self.page.tab_login.is_clickable() and self.page.tab_login.get_text() == 'Логин'
+
+    def test03_5_ls_tab_reset_password(self):
+        assert self.page.tab_ls.is_clickable() and self.page.tab_ls.get_text() == 'Лицевой счёт'
+
+    def test03_6_email_form_reset_password(self):
+        assert self.page.email_us_form.is_visible()
+
+    def test03_7_captcha_reset_password(self):
+        assert self.page.captcha_form.is_visible() and self.page.captcha_image.is_visible()
+
+    def test03_8_reset_btn_reset_password(self):
+        assert self.page.btn_reset.is_clickable() and self.page.btn_reset.get_text() == 'Продолжить'
+
+    def test03_9_back_btn_reset_password(self):
+        assert self.page.btn_reset_back.is_clickable() and 'Вернуться' in self.page.btn_reset_back.get_text()
+
+
+# 0.4. Наличие элементов для страницы регистрации
+@pytest.mark.usefixtures('init_start_reg_page')
+class TestStartRegElementsPresence:
+    def test04_1_h1_st_reg(self):
+        assert self.page.h1.get_text() == 'Регистрация'
+
+    def test04_2_blocks_st_reg(self):
+        assert self.page.left_block.is_presented() and self.page.right_block.is_presented()
+
+    @pytest.mark.xfail(reason='Пока элемент отсутствует')
+    def test04_3_tagline_st_reg(self):
+        assert self.page.rit_tagline.is_visible()
+
+    def test04_4_reg_div_st_reg(self):
+        assert self.page.reg_div.is_visible()
+
+    def test04_5_name_form_st_reg(self):
+        assert self.page.name_form.is_visible() and self.page.lastname_form.is_visible()
+
+    def test04_6_region_form_st_reg(self):
+        assert self.page.region_form.is_visible()
+
+    def test04_7_email_form_st_reg(self):
+        assert self.page.email_ad_form.is_visible()
+
+    def test04_8_password_form_st_reg(self):
+        assert self.page.password_form.is_visible() and self.page.password_confirm_form.is_visible()
+
+    def test04_9_reg_btn_st_reg(self):
+        assert self.page.btn_reg.is_clickable() and self.page.btn_reg.get_text() == 'Зарегистрироваться'
+
+    def test04_10_terms_of_use_st_reg(self):
         # assert для ссылки на политику конфиденциальности, которой нет
-        assert page.terms_of_use.is_visible() and page.terms_of_use_link.is_clickable()
+        assert self.page.terms_of_use.is_visible() and self.page.terms_of_use_link.is_clickable()
 
 
 # 1. Тесты для формы входа по быстрому коду
